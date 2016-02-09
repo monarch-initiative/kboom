@@ -1,0 +1,14 @@
+language: java
+sudo: false
+jdk:
+  - oraclejdk8
+
+branches:
+  only:
+  - master
+
+#before_install:
+#  - cd owlsim-core; make
+
+after_success:
+  - mvn clean cobertura:cobertura coveralls:report
