@@ -62,8 +62,8 @@ public class MarkdownRunner {
 		try {
 			png = dw.renderToFile(imageFilesPath);
 			String header = "\n\n## " + cs.cliqueId + "\n\n";
-			String prStats = " * __PR__=" + cs.probability+" CONFIDENCE=" + cs.confidence;
-			String stats = " * __SIZE__=" + cs.size;
+			String prStats = " * __Pr(G)__=" + cs.probability+" CONFIDENCE=" + cs.confidence;
+			String stats = " * __SIZE__=" + cs.size+" ("+cs.axioms.size()+" new axioms) ";
 			String link = "[img]("+png+")";
 			String axioms = cs.axioms.stream().map( (ax) -> " * " + LabelUtil.render(ax, ontology) + "\n" ).collect(Collectors.joining(""));
 			

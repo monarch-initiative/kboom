@@ -21,7 +21,7 @@ import org.monarchinitiative.owlbag.model.ProbabilisticGraph;
 import org.monarchinitiative.owlbag.runner.MarkdownRunner;
 import org.obolibrary.oboformat.parser.OBOFormatParserException;
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.io.RDFXMLOntologyFormat;
+import org.semanticweb.owlapi.formats.RDFXMLDocumentFormat;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLDataFactory;
@@ -174,7 +174,7 @@ public class ProbabilisticGraphCalculatorTest {
 		FileOutputStream os = new FileOutputStream(outfile);
 		//IOUtils.write("FOO", os);
 		System.err.println("Saving to "+outfile+" "+os+" "+ontology.getAxiomCount());
-		ontology.getOWLOntologyManager().saveOntology(ontology, new RDFXMLOntologyFormat(), os);
+		ontology.getOWLOntologyManager().saveOntology(ontology, new RDFXMLDocumentFormat(), os);
 		os.close();
 		return rpts;
 

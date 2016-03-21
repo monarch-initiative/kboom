@@ -17,8 +17,10 @@ import org.monarchinitiative.owlbag.model.ProbabilisticEdge;
 import org.monarchinitiative.owlbag.model.ProbabilisticGraph;
 import org.semanticweb.elk.owlapi.ElkReasonerFactory;
 import org.semanticweb.owlapi.io.OWLObjectRenderer;
+import org.semanticweb.owlapi.manchestersyntax.renderer.ManchesterOWLSyntaxOWLObjectRendererImpl;
 import org.semanticweb.owlapi.model.AddImport;
 import org.semanticweb.owlapi.model.AxiomType;
+import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
@@ -34,8 +36,7 @@ import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 
-import uk.ac.manchester.cs.owl.owlapi.mansyntaxrenderer.ManchesterOWLSyntaxOWLObjectRendererImpl;
-
+import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 
 /**
@@ -185,7 +186,8 @@ public class ProbabilisticGraphCalculator {
 	 * @param parentOntology
 	 */
 	public void addImport(OWLOntology baseOntology, OWLOntology parentOntology) {
-		OWLImportsDeclaration d = getOWLDataFactory().getOWLImportsDeclaration(baseOntology.getOntologyID().getOntologyIRI());
+		Optional<IRI> ontologyIRI = baseOntology.getOntologyID().getOntologyIRI();
+		OWLImportsDeclaration d = getOWLDataFactory().getOWLImportsDeclaration(ontologyIRI.orNull());
 		AddImport ai = new AddImport(parentOntology, d);
 		getOWLOntologyManager().applyChange(ai);
 
