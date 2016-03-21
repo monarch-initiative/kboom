@@ -5,16 +5,20 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.monarchinitiative.owlbag.compute.ProbabilisticGraphCalculator;
+import org.monarchinitiative.owlbag.io.IDTools;
 import org.monarchinitiative.owlbag.io.OWLLoader;
 import org.monarchinitiative.owlbag.io.ProbabilisticGraphParser;
 import org.monarchinitiative.owlbag.model.CliqueSolution;
 import org.monarchinitiative.owlbag.model.ProbabilisticGraph;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
@@ -32,14 +36,23 @@ public class RunEngine {
 	@Parameter(names = { "-o", "--out"}, description = "output ontology file")
 	private String outpath;
 
+	@Parameter(names = { "-c", "--classes"}, description = "Run only on cliques containing these classes")
+	private List<String> classIds;
+
 	@Parameter(names = { "-j", "--json"}, description = "output json report file")
 	private String jsonOutPath;
 
 	@Parameter(names = { "-t", "--table"}, description = "Path to TSV of probability table")
 	private String ptableFile;
 
+	@Parameter(names = { "-m", "--markdown"}, description = "Path tooutput markdown file")
+	private String mdOutputFile;
+
 	@Parameter(names = { "-n", "--new"}, description = "Make new ontology")
 	private Boolean isMakeNewOntology = false;
+	
+	@Parameter(names = { "--max" }, description = "Maximumum number of probabilistic edges in clique")
+	private Integer maxProbabilisticEdges = 9;
 
 	@Parameter(description = "Files")
 	private List<String> files = new ArrayList<>();
@@ -63,11 +76,28 @@ public class RunEngine {
 
 		ProbabilisticGraph pg = 
 				parser.parse(ptableFile);
+		MarkdownRunner mdr = new MarkdownRunner(sourceOntology, pg);
 
 		ProbabilisticGraphCalculator pgc = new ProbabilisticGraphCalculator(sourceOntology);
 		
 		pgc.setGraph(pg);
-		Set<CliqueSolution> rpts = pgc.breakCliques();
+		if (maxProbabilisticEdges != null)
+			pgc.setMaxProbabilisticEdges(maxProbabilisticEdges);
+		
+		if (classIds != null && classIds.size() > 0) {
+			Collector collector;
+			
+			Set<OWLClass> filterOnClasses = 
+					classIds.stream().map( s -> 
+					pgc.getOWLDataFactory().getOWLClass(IDTools.getIRIByIdentifier(s))).collect(Collectors.toSet());
+			pgc.setFilterOnClasses(filterOnClasses);
+		}
+		
+		Set<CliqueSolution> rpts = pgc.solveAllCliques();
+		
+		if (mdOutputFile != null) {
+			FileUtils.writeStringToFile(new File(mdOutputFile), mdr.render(rpts));
+		}
 		
 		OWLOntology outputOntology;
 		if (isMakeNewOntology) {
@@ -81,7 +111,11 @@ public class RunEngine {
 		}
 
 		
-		Gson w = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
+		Gson w = new GsonBuilder().
+				setPrettyPrinting().
+				serializeSpecialFloatingPointValues().
+				excludeFieldsWithoutExposeAnnotation().
+				create();
 		String s = w.toJson(rpts);
 		if (jsonOutPath == null)
 			System.out.println(s);
@@ -91,10 +125,8 @@ public class RunEngine {
 		if (outpath == null)
 			outpath = "foo.owl";
 		
-		File file = new File(jsonOutPath);
+		File file = new File(outpath);
 		sourceOntology.getOWLOntologyManager().saveOntology(outputOntology, IRI.create(file));
 		
-
-
 	}
 }

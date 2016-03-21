@@ -23,6 +23,20 @@ public class EdgeProbabilityTable {
 	public void setTypeProbabilityMap(Map<EdgeType, Double> typeProbabilityMap) {
 		this.typeProbabilityMap = typeProbabilityMap;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		Map<EdgeType, Double> tpm = getTypeProbabilityMap();
+		return 
+				" Sub: " + tpm.get(EdgeType.SUBCLASS_OF) +
+				" Sup: " + tpm.get(EdgeType.SUPERCLASS_OF) +
+				" Eqv: " + tpm.get(EdgeType.EQUIVALENT_TO) +
+				" N/a: " + tpm.get(EdgeType.NONE) +
+			 "]";
+	}
 	
 	
 	

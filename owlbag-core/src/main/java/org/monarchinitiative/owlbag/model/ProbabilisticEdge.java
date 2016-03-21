@@ -47,6 +47,16 @@ public class ProbabilisticEdge {
 		return probabilityTable;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return sourceClass
+				+ " -> " + targetClass + " Pr["
+				+ probabilityTable + "]";
+	}
+
 	
 	
 	

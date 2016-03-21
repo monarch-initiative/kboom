@@ -1,0 +1,9 @@
+catalog-v001.xml
+target/
+.classpath
+.project
+.settings
+./src/test/resources/catalog-v001.xml
+*iml
+.idea
+bin/*.jar

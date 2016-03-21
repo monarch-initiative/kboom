@@ -1,4 +1,5 @@
 ontology: x
+remark: fake ontology. fake OMIM IDs in flat hierarchy. Two additional hierarchies, X and Y
 
 [Term]
 id: X:root
@@ -11,6 +12,7 @@ is_a: X:root
 [Term]
 id: X:2
 is_a: X:root
+name: "x2"
 
 [Term]
 id: X:3

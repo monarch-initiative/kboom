@@ -95,7 +95,7 @@ public class OWLLoader {
 	}
 
 
-	private OWLOntologyManager getOWLOntologyManager() {
+	public OWLOntologyManager getOWLOntologyManager() {
 		if (manager == null)
 			manager = OWLManager.createOWLOntologyManager();
 		return manager;

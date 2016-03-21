@@ -13,6 +13,21 @@ import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLOntology;
 
+/**
+ * Parses probability tables
+ * 
+ * Format:
+ * <code>
+ * ClassA ClassB Pr(ASubClassOfB) Pr(BSubClassOfA) Pr(AEquivalentToB) Pr(ANotInLineageWithB)
+ * </code>
+ * 
+ * Note that here SubClassOf denotes both proper (ie not equivalent) and entailed/ancestors
+ * 
+ * 
+ * 
+ * @author cjm
+ *
+ */
 public class ProbabilisticGraphParser {
 
 	private static Logger LOG = Logger.getLogger(ProbabilisticGraphParser.class);
@@ -51,6 +66,7 @@ public class ProbabilisticGraphParser {
 			pg.getEdges().add(e);
 					
 		}
+		pg.collapseReciprocals();
 		return pg;
 	}
 
