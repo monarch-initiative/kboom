@@ -41,12 +41,18 @@ public class ProbabilisticGraph {
 
 
 	/**
-	 * @param edges the edges to set
+	 * @param edges the edges to add
 	 */
 	public void setEdges(List<ProbabilisticEdge> edges) {
 		this.edges = edges;
 	}
 
+	/**
+	 * @param badEdges the edges to remove
+	 */
+	public void removeEdges(Set<ProbabilisticEdge> badEdges) {
+		this.edges.removeAll(badEdges);
+	}
 
 
 	/**

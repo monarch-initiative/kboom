@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.reasoner.Node;
 
 import com.google.gson.annotations.Expose;
 
@@ -28,9 +29,10 @@ public class CliqueSolution {
 	@Expose public Boolean solved;
 	@Expose public List<String> messages = new ArrayList<String>();
 	
-	public Set<OWLClass> classes = new HashSet<OWLClass>();
-	public Set<OWLAxiom> axioms = new HashSet<OWLAxiom>();
+	public Set<OWLClass> classes = new HashSet<>();
+	public Set<OWLAxiom> axioms = new HashSet<>();
 	public ProbabilisticGraph subGraph;
+	public Set<Node<OWLClass>> nodes = new HashSet<>();
 	
 	@Expose public Set<String> axiomStrings;
 

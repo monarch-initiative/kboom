@@ -16,6 +16,7 @@ import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
+import org.semanticweb.owlapi.reasoner.Node;
 
 /**
  * Write a clique as a dot file
@@ -36,7 +37,7 @@ public class CliqueSolutionDotWriter {
 	}
 
 	public String render() {
-		return "digraph g {\n" + renderNodes() + 
+		return "digraph cliquegraph {\n" + renderNodesInCliques() + 
 				renderPriorLogicalEdges() + 
 				renderPriorEdges() + 
 				renderEdges() + 
@@ -55,17 +56,24 @@ public class CliqueSolutionDotWriter {
 		return png;
 	}
 
-	
-
-
-	private String renderNodes() {
-		return cs.classes.stream().map( (OWLClass c) -> renderClass(c)).collect(Collectors.joining("\n"));
+	private String renderNodesInCliques() {
+		return cs.nodes.stream().map( (Node<OWLClass> n) -> renderNode(n) ).collect(Collectors.joining("\n"));
 	}
+	
+	private String renderNode(Node<OWLClass> n) {
+		return "subgraph cluster_"+getId(n.getRepresentativeElement()) +" {" + 
+				n.getEntities().stream().map( (OWLClass c) -> renderClass(c)).collect(Collectors.joining("\n")) +
+				"}\n";
+				
+	}
+
+
 	private String renderClass(OWLClass c) {
 		return getId(c) + " [ label=\"" + getLabel(c) + "\" ];";
 	}
 
 	private String renderEdges() {
+		// render axioms blue
 		return cs.axioms.stream().map( (OWLAxiom a) -> renderEdge(a, "blue")).collect(Collectors.joining("\n"));
 	}
 	private String renderPriorLogicalEdges() {
@@ -77,6 +85,7 @@ public class CliqueSolutionDotWriter {
 	}
 
 	private String renderEdge(ProbabilisticEdge e) {
+		// probabilistic edges are dotted
 		return renderEdge(
 				getId(getId(e.getSourceClass())), 
 				getId(getId(e.getTargetClass())), 

@@ -5,29 +5,23 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.net.URISyntaxException;
 import java.util.Set;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Test;
-import org.monarchinitiative.owlbag.io.CliqueSolutionDotWriter;
 import org.monarchinitiative.owlbag.io.OWLLoader;
 import org.monarchinitiative.owlbag.io.ProbabilisticGraphParser;
 import org.monarchinitiative.owlbag.model.CliqueSolution;
 import org.monarchinitiative.owlbag.model.ProbabilisticGraph;
 import org.monarchinitiative.owlbag.runner.MarkdownRunner;
 import org.obolibrary.oboformat.parser.OBOFormatParserException;
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.formats.RDFXMLDocumentFormat;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
 import com.google.gson.Gson;
@@ -35,6 +29,8 @@ import com.google.gson.GsonBuilder;
 import com.google.monitoring.runtime.instrumentation.common.com.google.common.io.Resources;
 
 public class ProbabilisticGraphCalculatorTest {
+
+	private static Logger LOG = Logger.getLogger(ProbabilisticGraphCalculatorTest.class);
 
 	OWLLoader loader = new OWLLoader();
 	OWLOntology ontology;
@@ -60,7 +56,7 @@ public class ProbabilisticGraphCalculatorTest {
 				// note that even through the prior for equivalence here is high,
 				// it should be resolved as SubClassOf, when the full network is considered
 				subclass("OMIM_010", "X_3"),
-				
+
 				// the priors for equivalence for all 3 Zs to this one Y is high;
 				// however, maximally one can be equivalent to be consistent.
 				subclass("Z_2b1a", "Y_2b1"),
@@ -72,10 +68,10 @@ public class ProbabilisticGraphCalculatorTest {
 				equiv("Y_2", "X_2"),
 				equiv("Y_2", "Z_2"),
 				equiv("X_3", "Z_3")
-				
+
 				);
 	}
-	
+
 	@Test
 	public void testInconstent() throws OWLOntologyCreationException, OBOFormatParserException, IOException, OWLOntologyStorageException {
 		// Pr(X1<Y1) = 0.9 [row 1]
@@ -89,29 +85,56 @@ public class ProbabilisticGraphCalculatorTest {
 		CliqueSolution s = solns.iterator().next();
 		assertTrue("low confidence expected", s.confidence < 0.1);
 	}
-	
-	
+
+	@Test
+	public void testFalsePositive() throws OWLOntologyCreationException, OBOFormatParserException, IOException, OWLOntologyStorageException {
+		// in this test, OMIM:1xx is aligned with Y
+		// and OMIM:2xx is aligned with Z
+		// fake join point
+		// **OMIM:101	Z:2b1c	0.8	0.08	0.1	0.02
+
+		Set<CliqueSolution> solns = 
+				runUsingResources("basic-fp.obo", "ptable-false-positive.tsv", "fp-resolved.owl",
+						subclass("OMIM_101", "Y_1a1"),
+						subclass("OMIM_101", "X_2b")
+						);
+		assertEquals(3, solns.size());
+	}
+
+	@Test
+	public void testFalsePositiveNoTieBreaker() throws OWLOntologyCreationException, OBOFormatParserException, IOException, OWLOntologyStorageException {
+		// same as previous test, we have a false link
+		//   OMIM:101	Z:2b1c	0.8	0.08	0.1	0.02
+		// but we lack X:2b to break the tie, resulting in 101 going into its own clique
+
+		Set<CliqueSolution> solns = 
+				runUsingResources("basic-fp.obo", "ptable-false-positive2.tsv", "fp-resolved.owl"
+						);
+		assertEquals(4, solns.size());
+	}
+
+
 	public IRI getIRI(String c) {
 		return IRI.create("http://purl.obolibrary.org/obo/"+c);
 	}
-	
+
 	public OWLDataFactory df() {
 		return loader.getOWLOntologyManager().getOWLDataFactory();
 	}
-	
-	
+
+
 
 	public OWLAxiom equiv(String c1, String c2) {
 		return df().getOWLEquivalentClassesAxiom(
 				df().getOWLClass(getIRI(c1)),
 				df().getOWLClass(getIRI(c2)));
-				
+
 	}
 	public OWLAxiom subclass(String c1, String c2) {
 		return df().getOWLSubClassOfAxiom(
 				df().getOWLClass(getIRI(c1)),
 				df().getOWLClass(getIRI(c2)));
-				
+
 	}
 
 	public boolean contains(Set<CliqueSolution> cliques, OWLAxiom ea) {
@@ -141,6 +164,8 @@ public class ProbabilisticGraphCalculatorTest {
 	}
 
 	public Set<CliqueSolution> runUsingPaths(String ontFile, String ptablePath, String outpath) throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
+		LOG.info("ONT: "+ontFile);
+		LOG.info("PROBS: "+ptablePath);
 		Logger.getLogger("org.semanticweb.elk").setLevel(Level.OFF);
 		ontology = loader.loadOWL(ontFile);
 		ProbabilisticGraphParser parser = 

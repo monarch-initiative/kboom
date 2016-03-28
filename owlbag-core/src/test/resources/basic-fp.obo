@@ -54,6 +54,9 @@ id: Y:1a1
 is_a: Y:1a
 
 [Term]
+id: W:1a1
+
+[Term]
 id: Y:1b
 is_a: Y:1
 
@@ -157,4 +160,44 @@ is_a: OMIM:root
 
 [Term]
 id: OMIM:010
+is_a: OMIM:root
+
+[Term]
+id: OMIM:101
+is_a: OMIM:root
+
+[Term]
+id: OMIM:102
+is_a: OMIM:root
+
+[Term]
+id: OMIM:103
+is_a: OMIM:root
+
+[Term]
+id: OMIM:104
+is_a: OMIM:root
+
+[Term]
+id: OMIM:105
+is_a: OMIM:root
+
+[Term]
+id: OMIM:106
+is_a: OMIM:root
+
+[Term]
+id: OMIM:107
+is_a: OMIM:root
+
+[Term]
+id: OMIM:107
+is_a: OMIM:root
+
+[Term]
+id: OMIM:109
+is_a: OMIM:root
+
+[Term]
+id: OMIM:110
 is_a: OMIM:root

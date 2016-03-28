@@ -38,6 +38,7 @@ import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 
 /**
  * 
@@ -56,15 +57,15 @@ public class ProbabilisticGraphCalculator {
 	OWLReasonerFactory reasonerFactory = new ElkReasonerFactory();
 	OWLObjectRenderer renderer;
 	Set<OWLClass> filterOnClasses;
-	
-	
+
+
 	//OWLReasonerFactory reasonerFactory = new org.semanticweb.HermiT.Reasoner.ReasonerFactory();
-	
+
 	/**
 	 * Number of probabilistic edges after which a clique is broken down using heuristics
 	 */
 	public int maxProbabilisticEdges = 10;
-	
+
 	/**
 	 * Number of probabilistic edges below which no attempt will be made to resolve clique
 	 */
@@ -74,7 +75,7 @@ public class ProbabilisticGraphCalculator {
 		super();
 		this.sourceOntology = sourceOntology;
 		LabelProvider provider = new LabelProvider(sourceOntology);
-		 renderer = 
+		renderer = 
 				new ManchesterOWLSyntaxOWLObjectRendererImpl();
 		renderer.setShortFormProvider(provider);
 	}
@@ -156,7 +157,7 @@ public class ProbabilisticGraphCalculator {
 		this.minProbabilisticEdges = minProbabilisticEdges;
 	}
 
-	
+
 
 	/**
 	 * @param filterOnClasses the filterOnClasses to set
@@ -213,28 +214,102 @@ public class ProbabilisticGraphCalculator {
 		addImport(sourceOntology, dynamicOntology);
 		OWLReasoner reasoner = getReasonerFactory().createReasoner(dynamicOntology);
 
+		// assume every probabilistic edge is an equivalence axiom
 		for (ProbabilisticEdge e : graph.getEdges()) {
-			OWLEquivalentClassesAxiom ax = getOWLDataFactory().getOWLEquivalentClassesAxiom(e.getSourceClass(), e.getTargetClass());
-			getOWLOntologyManager().addAxiom(dynamicOntology, ax);
+			if (e.getProbabilityTable().getTypeProbabilityMap().get(EdgeType.NONE) < 1.0) {
+				OWLEquivalentClassesAxiom ax = translateEdgeToEquivalenceAxiom(e);
+				getOWLOntologyManager().addAxiom(dynamicOntology, ax);
+			}
 		}
 		reasoner.flush();
-		int maxCliqueSize = 0;
-		Set<Node<OWLClass>> cliques = new HashSet<Node<OWLClass>>();
+		Set<Node<OWLClass>> cliques = new HashSet<>();
 		for (OWLClass c : sourceOntology.getClassesInSignature()) {
 			Node<OWLClass> n = reasoner.getEquivalentClasses(c);
 			int size = n.getSize();
 			if (size > 1) {
 				cliques.add(n);
 			}
-			if (size > maxCliqueSize)
-				maxCliqueSize = size;
 		}
+
+		LOG.info("|Cliques| = "+cliques.size()+" (first pass)");
+		// split cliques
+		Set<Node<OWLClass>> removedCliques = new HashSet<>();
+		Set<Node<OWLClass>> newCliques = new HashSet<>();
+		for (Node<OWLClass> node : cliques) {
+			int nodeSize = node.getSize();
+			// TODO - less arbitrary sizes
+			if (nodeSize > 6) {
+				LOG.info("Candidate for splitting: "+render(node.getRepresentativeElement()));
+				Set<OWLClass> clzs = node.getEntities();
+				Set<ProbabilisticEdge> badEdges = new HashSet<>();
+				for (ProbabilisticEdge e : graph.getEdges()) {
+					if (clzs.contains(e.getSourceClass())) {
+						OWLEquivalentClassesAxiom ax = translateEdgeToEquivalenceAxiom(e);								
+						getOWLOntologyManager().removeAxiom(dynamicOntology, ax);
+						reasoner.flush();
+						Node<OWLClass> newLeftNode = reasoner.getEquivalentClasses(e.getSourceClass());
+						Node<OWLClass> newRightNode = reasoner.getEquivalentClasses(e.getTargetClass());
+						if (newLeftNode.getSize() >= 3 && newRightNode.getSize() >= 3) {
+							double sim = getSimilarity(e.getSourceClass(), e.getTargetClass(), reasoner);
+							LOG.debug("Similarity = "+sim+" For: "+e);
+							if (sim < 0.25) { // TODO - no hardcoding
+								badEdges.add(e);
+								LOG.info(" Splitting: "+render(e)+"  Similarity="+sim+" subCliqueSizes: "+
+										newLeftNode.getSize() +","+newRightNode.getSize());
+							}
+						}
+						getOWLOntologyManager().addAxiom(dynamicOntology, ax);
+					}
+				}
+				if (badEdges.size() > 0) {
+					for (ProbabilisticEdge e : badEdges) {
+						OWLEquivalentClassesAxiom ax = translateEdgeToEquivalenceAxiom(e);
+						getOWLOntologyManager().removeAxiom(dynamicOntology, ax);
+					}
+					reasoner.flush();
+					removedCliques.add(node);
+					for (OWLClass c : clzs) {
+						newCliques.add(reasoner.getEquivalentClasses(c));
+					}
+					LOG.info("prEdges (before splits):"+graph.getEdges().size());
+					graph.removeEdges(badEdges);
+					LOG.info("prEdges (after splits):"+graph.getEdges().size());
+				}
+			}
+		}
+
+		if (removedCliques.size() > 0) {
+			LOG.info("REMOVING: "+removedCliques);
+			LOG.info("ADDING: "+newCliques);
+			cliques.removeAll(removedCliques);
+			cliques.addAll(newCliques);
+		}
+		LOG.info("|Cliques| = "+cliques.size()+" (after splitting)");
+
+
+		int maxCliqueSize = 0;
+		for (Node<OWLClass> n : cliques) {
+			if (n.getSize() > maxCliqueSize)
+				maxCliqueSize = n.getSize();
+		}
+
+
 		reasoner.dispose();
-		LOG.info("MaxSize=" + maxCliqueSize);
+		LOG.info("MaxCliqueSize=" + maxCliqueSize);
 		LOG.info("|Cliques|=" + cliques.size());
 		return cliques;
 	}
 
+	private double getSimilarity(OWLClass c, OWLClass d, OWLReasoner reasoner) {
+		Set<OWLClass> ca = reasoner.getSuperClasses(c, false).getFlattened();
+		Set<OWLClass> da = reasoner.getSuperClasses(d, false).getFlattened();
+		return Sets.intersection(ca, da).size() / (double)(Sets.union(ca, da).size());
+	}
+
+	private OWLEquivalentClassesAxiom translateEdgeToEquivalenceAxiom(ProbabilisticEdge e) {
+		return getOWLDataFactory().getOWLEquivalentClassesAxiom(e.getSourceClass(),
+				e.getTargetClass());
+	}
 
 	/**
 	 * Solves all cliques and adds resulting axioms back into main ontology
@@ -248,13 +323,15 @@ public class ProbabilisticGraphCalculator {
 		Set<CliqueSolution> rpts = new HashSet<CliqueSolution>();
 		int ctr = 0;
 		for (Node<OWLClass> n : cliques) {
+
+			// user option: only process nodes with desired classes
 			if (filterOnClasses != null && filterOnClasses.size() > 0) {
 				if (n.getEntities().stream().filter( c -> filterOnClasses.contains(c)).count() == 0) {
 					LOG.info("Skipping: "+render(n.getEntities()));
 					continue;
 				}
 			}
-			
+
 			ctr++;
 			LOG.info("NUM:"+ctr+"/"+cliques.size());
 			CliqueSolution rpt = solveClique(n);
@@ -352,7 +429,7 @@ public class ProbabilisticGraphCalculator {
 
 		OWLOntology probOntology = mgr.createOntology();
 		addImport(logicalOntology, probOntology);
-		
+
 		// we create a new reasoner instance for every clique
 		OWLReasoner reasoner = reasonerFactory.createReasoner(probOntology);
 
@@ -374,7 +451,7 @@ public class ProbabilisticGraphCalculator {
 			if (s % 1000 == 0) {
 				LOG.info("STATE:"+s+" / "+NUM_STATES+" :: "+states);
 			}
-			
+
 			// each state corresponds to a combination of axioms; initialize this
 			Set<OWLAxiom> axiomCombo = new HashSet<OWLAxiom>();
 			boolean isZeroProbability = false;
@@ -447,16 +524,16 @@ public class ProbabilisticGraphCalculator {
 			Set<OWLAxiom> candidateCombinationOfNewAxioms =
 					new HashSet<OWLAxiom>(axiomCombo);
 			candidateCombinationOfNewAxioms.addAll(additionalLogicalAxioms);
-			
+
 			for (OWLAxiom candidateAxiom : candidateCombinationOfNewAxioms) {
-				LOG.info("CANDIDATE: "+candidateAxiom);
+				LOG.debug("CANDIDATE: "+candidateAxiom);
 				if (candidateAxiom instanceof OWLSubClassOfAxiom) {
 					OWLClass c = (OWLClass) ((OWLSubClassOfAxiom) candidateAxiom).getSubClass();
 					OWLClass t = (OWLClass) ((OWLSubClassOfAxiom) candidateAxiom).getSuperClass();
 					Set<OWLClass> superClasses = reasoner.getSuperClasses(c, false).getFlattened();
 
 					if (!superClasses.contains(t)) {
-						LOG.info("Pr["+candidateAxiom+"]=0 because InferredProperSupers("+c+") DOES NOT CONTAIN "+t+" // InferredProperSupers= "+superClasses);
+						LOG.debug("Pr["+candidateAxiom+"]=0 because InferredProperSupers("+c+") DOES NOT CONTAIN "+t+" // InferredProperSupers= "+superClasses);
 						isZeroProbability = true;
 						jointProbability = 0;
 						break;
@@ -496,12 +573,12 @@ public class ProbabilisticGraphCalculator {
 			if (maxParents > 1) {
 				pMaxParents = 0.4 * (1.0 / Math.pow(2, maxParents-1));
 			}
-			LOG.info("MAX_PARENTS:"+maxParents+" p="+pMaxParents);
+			LOG.debug("MAX_PARENTS:"+maxParents+" p="+pMaxParents);
 			jointProbability *= pMaxParents;
 
 			jointProbability *= initialProbability;
 
-			LOG.info(" Prob="+jointProbability+" "+axiomCombo);
+			LOG.debug(" Prob="+jointProbability+" "+axiomCombo);
 			stateScoreMap.put(s, jointProbability);
 			sumOfJointProbabilities += jointProbability;
 			if (jointProbability > maxJointProbability) {
@@ -511,8 +588,8 @@ public class ProbabilisticGraphCalculator {
 			numValidCombos++;
 		}
 
-		// always dispose of our reasoner tidily
-		reasoner.dispose();
+
+
 
 		sumOfJointProbabilities += (1-initialProbability);
 
@@ -550,6 +627,19 @@ public class ProbabilisticGraphCalculator {
 			cliqSoln.axiomStrings.add(render(ax));
 		}
 		cliqSoln.solved =  true;
+
+		// put sub-cliques into clique solution
+		mgr.removeAxioms(probOntology, probOntology.getAxioms());
+		mgr.addAxioms(probOntology, bestCombinationOfAxioms);
+		reasoner.flush();
+		cliqSoln.nodes = new HashSet<>();
+		for (OWLClass c : cliqSoln.classes) {
+			cliqSoln.nodes.add(reasoner.getEquivalentClasses(c));
+		}
+
+		// always dispose of our reasoner
+		reasoner.dispose();
+
 		return cliqSoln;
 	}
 
@@ -673,7 +763,7 @@ public class ProbabilisticGraphCalculator {
 		double maxp = 0.0;
 		OWLAxiom ax = null;
 		for (int i=0; i<sg.getEdges().size(); i++) {
-			
+
 			double[] prt = sg.getProbabilityIndex()[i];
 			for (int j=0; j<4; j++) {
 				if (prt[j] > maxp) {
@@ -697,7 +787,12 @@ public class ProbabilisticGraphCalculator {
 		LOG.info("PR EDGE: " + e + " ==> LOGICAL EDGE: "+render(ax));
 		return pr;
 	}
-	
+
+	public String render(ProbabilisticEdge e) {
+		return renderer.render(e.getSourceClass()) +" -> "+renderer.render(e.getTargetClass()) +
+				" PT: "+e.getProbabilityTable();
+	}
+
 	public String render(OWLObject obj) {
 		if (obj == null)
 			return "NULL";
