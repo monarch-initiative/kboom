@@ -65,6 +65,11 @@ public class ProbabilisticGraphCalculator {
 	 * Number of probabilistic edges after which a clique is broken down using heuristics
 	 */
 	public int maxProbabilisticEdges = 10;
+	
+	/**
+	 * 
+	 */
+	public int cliqueSplitSize = 6;
 
 	/**
 	 * Number of probabilistic edges below which no attempt will be made to resolve clique
@@ -160,6 +165,22 @@ public class ProbabilisticGraphCalculator {
 
 
 	/**
+	 * @return the cliqueSplitSize
+	 */
+	public int getCliqueSplitSize() {
+		return cliqueSplitSize;
+	}
+
+
+	/**
+	 * @param cliqueSplitSize the cliqueSplitSize to set
+	 */
+	public void setCliqueSplitSize(int cliqueSplitSize) {
+		this.cliqueSplitSize = cliqueSplitSize;
+	}
+
+
+	/**
 	 * @param filterOnClasses the filterOnClasses to set
 	 */
 	public void setFilterOnClasses(Set<OWLClass> filterOnClasses) {
@@ -238,7 +259,7 @@ public class ProbabilisticGraphCalculator {
 		for (Node<OWLClass> node : cliques) {
 			int nodeSize = node.getSize();
 			// TODO - less arbitrary sizes
-			if (nodeSize > 6) {
+			if (nodeSize > cliqueSplitSize) {
 				LOG.info("Candidate for splitting: "+render(node.getRepresentativeElement()));
 				Set<OWLClass> clzs = node.getEntities();
 				Set<ProbabilisticEdge> badEdges = new HashSet<>();

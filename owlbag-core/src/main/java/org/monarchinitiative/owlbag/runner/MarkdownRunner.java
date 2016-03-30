@@ -6,9 +6,12 @@ import java.util.stream.Collectors;
 
 import org.monarchinitiative.owlbag.compute.ProbabilisticGraphCalculator;
 import org.monarchinitiative.owlbag.io.CliqueSolutionDotWriter;
+import org.monarchinitiative.owlbag.io.LabelProvider;
 import org.monarchinitiative.owlbag.model.CliqueSolution;
 import org.monarchinitiative.owlbag.model.LabelUtil;
 import org.monarchinitiative.owlbag.model.ProbabilisticGraph;
+import org.semanticweb.owlapi.io.OWLObjectRenderer;
+import org.semanticweb.owlapi.manchestersyntax.renderer.ManchesterOWLSyntaxOWLObjectRendererImpl;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
@@ -24,11 +27,17 @@ public class MarkdownRunner {
 	OWLOntology ontology;
 	ProbabilisticGraph pg;
 	String imageFilesPath = "target/img-";
+	OWLObjectRenderer renderer;
 	
 	public MarkdownRunner(OWLOntology ontology, ProbabilisticGraph pg) {
 		super();
 		this.ontology = ontology;
 		this.pg = pg;
+		
+		LabelProvider provider = new LabelProvider(ontology);
+		renderer = new ManchesterOWLSyntaxOWLObjectRendererImpl();
+		renderer.setShortFormProvider(provider);
+
 	}
 
 
@@ -65,7 +74,8 @@ public class MarkdownRunner {
 			String prStats = " * __Pr(G)__=" + cs.probability+" CONFIDENCE=" + cs.confidence;
 			String stats = " * __SIZE__=" + cs.size+" ("+cs.axioms.size()+" new axioms) ";
 			String link = "[img]("+png+")";
-			String axioms = cs.axioms.stream().map( (ax) -> " * " + LabelUtil.render(ax, ontology) + "\n" ).collect(Collectors.joining(""));
+			//String axioms = cs.axioms.stream().map( (ax) -> " * " + LabelUtil.render(ax, ontology) + "\n" ).collect(Collectors.joining(""));
+			String axioms = cs.axioms.stream().map( (ax) -> " * " + renderer.render(ax) + "\n" ).collect(Collectors.joining(""));
 			
 			return header + prStats + "\n" + stats + "\n" + link + "\n" + axioms;
 		} catch (IOException e) {

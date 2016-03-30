@@ -48,7 +48,7 @@ public class LabelUtil {
 		OWLAnnotationProperty p = ontology.getOWLOntologyManager().getOWLDataFactory().getRDFSLabel();
 		Collection<OWLAnnotation> anns = EntitySearcher.getAnnotations(c, ontology);
 		for (OWLAnnotation a : anns) {
-			if (a.getValue() instanceof OWLLiteral) {
+			if (a.getValue() instanceof OWLLiteral && a.getProperty().equals(p)) {
 				return ((OWLLiteral)a.getValue()).getLiteral().toString();
 			}
 		}
