@@ -73,12 +73,12 @@ public class ProbabilisticGraphCalculatorTest {
 	}
 
 	@Test
-	public void testInconstent() throws OWLOntologyCreationException, OBOFormatParserException, IOException, OWLOntologyStorageException {
+	public void testReciprocalConflict() throws OWLOntologyCreationException, OBOFormatParserException, IOException, OWLOntologyStorageException {
 		// Pr(X1<Y1) = 0.9 [row 1]
 		// Pr(X1<Y1) = 0.05 [row 2]
 
 		Set<CliqueSolution> solns = 
-				runUsingResources("basic.obo", "ptable-inconsistent.tsv", "inconsistent-resolved.owl",
+				runUsingResources("basic.obo", "ptable-reciprocal-conflict.tsv", "reciprocal-conflict-resolved.owl",
 						subclass("X_1", "Y_1")
 						);
 		assertEquals(1, solns.size());
