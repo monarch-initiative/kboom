@@ -1,4 +1,4 @@
-package org.monarchinitiative.owlbag.io;
+package org.monarchinitiative.boom.io;
 
 import org.semanticweb.owlapi.model.IRI;
 

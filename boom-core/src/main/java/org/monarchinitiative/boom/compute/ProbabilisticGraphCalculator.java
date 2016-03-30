@@ -1,4 +1,4 @@
-package org.monarchinitiative.owlbag.compute;
+package org.monarchinitiative.boom.compute;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,11 +10,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
-import org.monarchinitiative.owlbag.io.LabelProvider;
-import org.monarchinitiative.owlbag.model.CliqueSolution;
-import org.monarchinitiative.owlbag.model.EdgeType;
-import org.monarchinitiative.owlbag.model.ProbabilisticEdge;
-import org.monarchinitiative.owlbag.model.ProbabilisticGraph;
+import org.monarchinitiative.boom.io.LabelProvider;
+import org.monarchinitiative.boom.model.CliqueSolution;
+import org.monarchinitiative.boom.model.EdgeType;
+import org.monarchinitiative.boom.model.ProbabilisticEdge;
+import org.monarchinitiative.boom.model.ProbabilisticGraph;
 import org.semanticweb.elk.owlapi.ElkReasonerFactory;
 import org.semanticweb.owlapi.io.OWLObjectRenderer;
 import org.semanticweb.owlapi.manchestersyntax.renderer.ManchesterOWLSyntaxOWLObjectRendererImpl;

@@ -1,9 +1,9 @@
-package org.monarchinitiative.owlbag.model;
+package org.monarchinitiative.boom.model;
 
 import java.util.Collection;
 import java.util.List;
 
-import org.monarchinitiative.owlbag.io.LabelProvider;
+import org.monarchinitiative.boom.io.LabelProvider;
 import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLAxiom;

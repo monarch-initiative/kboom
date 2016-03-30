@@ -1,4 +1,4 @@
-package org.monarchinitiative.owlbag.model;
+package org.monarchinitiative.boom.model;
 
 import java.util.ArrayList;
 import java.util.HashSet;

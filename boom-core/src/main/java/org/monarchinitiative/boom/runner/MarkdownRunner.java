@@ -1,15 +1,15 @@
-package org.monarchinitiative.owlbag.runner;
+package org.monarchinitiative.boom.runner;
 
 import java.io.IOException;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.monarchinitiative.owlbag.compute.ProbabilisticGraphCalculator;
-import org.monarchinitiative.owlbag.io.CliqueSolutionDotWriter;
-import org.monarchinitiative.owlbag.io.LabelProvider;
-import org.monarchinitiative.owlbag.model.CliqueSolution;
-import org.monarchinitiative.owlbag.model.LabelUtil;
-import org.monarchinitiative.owlbag.model.ProbabilisticGraph;
+import org.monarchinitiative.boom.compute.ProbabilisticGraphCalculator;
+import org.monarchinitiative.boom.io.CliqueSolutionDotWriter;
+import org.monarchinitiative.boom.io.LabelProvider;
+import org.monarchinitiative.boom.model.CliqueSolution;
+import org.monarchinitiative.boom.model.LabelUtil;
+import org.monarchinitiative.boom.model.ProbabilisticGraph;
 import org.semanticweb.owlapi.io.OWLObjectRenderer;
 import org.semanticweb.owlapi.manchestersyntax.renderer.ManchesterOWLSyntaxOWLObjectRendererImpl;
 import org.semanticweb.owlapi.model.OWLOntology;

@@ -1,4 +1,4 @@
-package org.monarchinitiative.owlbag.model;
+package org.monarchinitiative.boom.model;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -6,4 +6,4 @@
  * @author cjm
  *
  */
-package org.monarchinitiative.owlbag.model;
+package org.monarchinitiative.boom.model;

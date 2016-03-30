@@ -7,4 +7,4 @@
  * @author cjm
  *
  */
-package org.monarchinitiative.owlbag.io;
+package org.monarchinitiative.boom.io;

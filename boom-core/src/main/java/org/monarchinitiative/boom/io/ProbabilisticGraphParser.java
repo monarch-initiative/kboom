@@ -1,4 +1,4 @@
-package org.monarchinitiative.owlbag.io;
+package org.monarchinitiative.boom.io;
 
 import java.io.File;
 import java.io.IOException;
@@ -6,8 +6,8 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-import org.monarchinitiative.owlbag.model.ProbabilisticEdge;
-import org.monarchinitiative.owlbag.model.ProbabilisticGraph;
+import org.monarchinitiative.boom.model.ProbabilisticEdge;
+import org.monarchinitiative.boom.model.ProbabilisticGraph;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;

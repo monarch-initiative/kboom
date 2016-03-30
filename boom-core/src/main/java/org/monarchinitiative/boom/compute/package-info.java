@@ -5,4 +5,4 @@
  * @author cjm
  *
  */
-package org.monarchinitiative.owlbag.compute;
+package org.monarchinitiative.boom.compute;

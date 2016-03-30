@@ -1,4 +1,4 @@
-package org.monarchinitiative.owlbag.io;
+package org.monarchinitiative.boom.io;
 
 import java.io.File;
 import java.io.IOException;
@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
-import org.monarchinitiative.owlbag.model.CliqueSolution;
-import org.monarchinitiative.owlbag.model.LabelUtil;
-import org.monarchinitiative.owlbag.model.ProbabilisticEdge;
+import org.monarchinitiative.boom.model.CliqueSolution;
+import org.monarchinitiative.boom.model.LabelUtil;
+import org.monarchinitiative.boom.model.ProbabilisticEdge;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;

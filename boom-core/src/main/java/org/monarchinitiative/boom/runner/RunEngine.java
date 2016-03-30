@@ -1,4 +1,4 @@
-package org.monarchinitiative.owlbag.runner;
+package org.monarchinitiative.boom.runner;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,12 +11,12 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.monarchinitiative.owlbag.compute.ProbabilisticGraphCalculator;
-import org.monarchinitiative.owlbag.io.IDTools;
-import org.monarchinitiative.owlbag.io.OWLLoader;
-import org.monarchinitiative.owlbag.io.ProbabilisticGraphParser;
-import org.monarchinitiative.owlbag.model.CliqueSolution;
-import org.monarchinitiative.owlbag.model.ProbabilisticGraph;
+import org.monarchinitiative.boom.compute.ProbabilisticGraphCalculator;
+import org.monarchinitiative.boom.io.IDTools;
+import org.monarchinitiative.boom.io.OWLLoader;
+import org.monarchinitiative.boom.io.ProbabilisticGraphParser;
+import org.monarchinitiative.boom.model.CliqueSolution;
+import org.monarchinitiative.boom.model.ProbabilisticGraph;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLOntology;
