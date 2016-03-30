@@ -610,7 +610,13 @@ public class ProbabilisticGraphCalculator {
 		}
 
 
-
+		if (numValidCombos == 0) {
+			cliqSoln.messages.add("UNSATISFIABLE");
+			cliqSoln.solved = false;
+			cliqSoln.probability = 0.0;
+			reasoner.dispose();
+			return cliqSoln;
+		}
 
 		sumOfJointProbabilities += (1-initialProbability);
 

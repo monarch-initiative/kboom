@@ -87,6 +87,33 @@ public class ProbabilisticGraphCalculatorTest {
 	}
 
 	@Test
+	public void testUnsatisfiable() throws OWLOntologyCreationException, OBOFormatParserException, IOException, OWLOntologyStorageException {
+		// Pr(X1<Y1) = 0.9 [row 1]
+		// Pr(X1<Y1) = 0.05 [row 2]
+
+		Set<CliqueSolution> solns = 
+				runUsingResources("basic.obo", "ptable-unsatisfiable.tsv", "unsatisfiable-resolved.owl"
+						);
+		assertEquals(1, solns.size());
+		CliqueSolution s = solns.iterator().next();
+		assertTrue("this clique has no solution", !s.solved);
+	}
+
+	@Test
+	public void testOneSolution() throws OWLOntologyCreationException, OBOFormatParserException, IOException, OWLOntologyStorageException {
+		// Pr(X1<Y1) = 0.9 [row 1]
+		// Pr(X1<Y1) = 0.05 [row 2]
+
+		Set<CliqueSolution> solns = 
+				runUsingResources("basic.obo", "ptable-one-solution.tsv", "one-solution-resolved.owl"
+						);
+		assertEquals(1, solns.size());
+		CliqueSolution s = solns.iterator().next();
+		assertEquals("this clique has a single solution, which is to reject the proposed axiom",
+				0, s.axioms.size());
+	}
+
+	@Test
 	public void testFalsePositive() throws OWLOntologyCreationException, OBOFormatParserException, IOException, OWLOntologyStorageException {
 		// in this test, OMIM:1xx is aligned with Y
 		// and OMIM:2xx is aligned with Z
