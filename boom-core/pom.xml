@@ -21,7 +21,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
-					<finalName>owlbag</finalName>
+					<finalName>boom</finalName>
 					<appendAssemblyId>false</appendAssemblyId>
 					<attach>false</attach>
 					<outputDirectory>${project.parent.basedir}/bin</outputDirectory>
@@ -31,7 +31,7 @@
 					<archive>
 						<manifest>
 							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-							<mainClass>org.monarchinitiative.owlbag.compute.runner.RunEngine</mainClass>
+							<mainClass>org.monarchinitiative.boom.compute.runner.RunEngine</mainClass>
 						</manifest>
 					</archive>
 				</configuration>

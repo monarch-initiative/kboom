@@ -115,6 +115,20 @@ public class ProbabilisticGraphCalculatorTest {
 	}
 
 	@Test
+	public void testOverride() throws OWLOntologyCreationException, OBOFormatParserException, IOException, OWLOntologyStorageException {
+		// Pr(X1b<Xroot) = 0.01
+		// however, this is also specified as a logical axiom
+		
+		Set<CliqueSolution> solns = 
+				runUsingResources("basic.obo", "ptable-override.tsv", "override-resolved.owl"
+						);
+		assertEquals(1, solns.size());
+		CliqueSolution s = solns.iterator().next();
+		assertEquals("this clique has a single solution, which is to accept the proposed axiom",
+				0, s.axioms.size());
+	}
+
+	@Test
 	public void testFalsePositive() throws OWLOntologyCreationException, OBOFormatParserException, IOException, OWLOntologyStorageException {
 		// in this test, OMIM:1xx is aligned with Y
 		// and OMIM:2xx is aligned with Z

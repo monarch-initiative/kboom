@@ -4,7 +4,7 @@ DIRNAME=`dirname $0`
 # Give a space-separated list of classpath items RELATIVE TO THE CURRENT SCRIPT
 # These will be resolved into absolute pathnames
 # Wildcards are allowed
-CLASSPATH_RELATIVE=owlbag.jar
+CLASSPATH_RELATIVE=boom.jar
 
 ## Check for Cygwin, use grep for a case-insensitive search
 IS_CYGWIN="FALSE"
@@ -125,7 +125,7 @@ then
 fi
 
 ## Assemble and run the final command.
-CMD="\"$JAVAPATH\" -Xms2048M -DentityExpansionLimit=4086000 -Djava.awt.headless=true -classpath \"$CLASSPATH\" -DlauncherDir=\"$LAUNCHER_DIR\" $JAVAARGS org.monarchinitiative.owlbag.runner.RunEngine $CMDARGS"
+CMD="\"$JAVAPATH\" -Xms2048M -DentityExpansionLimit=4086000 -Djava.awt.headless=true -classpath \"$CLASSPATH\" -DlauncherDir=\"$LAUNCHER_DIR\" $JAVAARGS org.monarchinitiative.boom.runner.RunEngine $CMDARGS"
 
 ## DEBUG
 ## Let's see a little of the environment if we declare DEBUG=1.
