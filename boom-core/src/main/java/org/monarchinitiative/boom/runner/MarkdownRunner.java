@@ -71,13 +71,14 @@ public class MarkdownRunner {
 		try {
 			png = dw.renderToFile(imageFilesPath);
 			String header = "\n\n## " + cs.cliqueId + "\n\n";
-			String prStats = " * __Pr(G)__=" + cs.probability+" CONFIDENCE=" + cs.confidence;
+			String prStats = " * __Pr(G)__=" + cs.probability+" CONFIDENCE=" + cs.confidence+" Success:" + cs.solved;
 			String stats = " * __SIZE__=" + cs.size+" ("+cs.axioms.size()+" new axioms) ";
 			String link = "[img]("+png+")";
 			//String axioms = cs.axioms.stream().map( (ax) -> " * " + LabelUtil.render(ax, ontology) + "\n" ).collect(Collectors.joining(""));
+			String members = cs.classes.stream().map( (c) -> " * MEMBER: " + renderer.render(c) + "\n" ).collect(Collectors.joining(""));
 			String axioms = cs.axioms.stream().map( (ax) -> " * " + renderer.render(ax) + "\n" ).collect(Collectors.joining(""));
 			
-			return header + prStats + "\n" + stats + "\n" + link + "\n" + axioms;
+			return header + prStats + "\n" + stats + "\n" + link + "\n" + members + axioms;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

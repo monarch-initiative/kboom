@@ -54,6 +54,9 @@ public class RunEngine {
 	@Parameter(names = { "--max" }, description = "Maximumum number of probabilistic edges in clique")
 	private Integer maxProbabilisticEdges = 9;
 
+	@Parameter(names = { "--splitSize" }, description = "Maximumum number of probabilistic edges in clique")
+	private Integer cliqueSplitSize = 6;
+
 	@Parameter(description = "Files")
 	private List<String> files = new ArrayList<>();
 
@@ -83,6 +86,9 @@ public class RunEngine {
 		pgc.setGraph(pg);
 		if (maxProbabilisticEdges != null)
 			pgc.setMaxProbabilisticEdges(maxProbabilisticEdges);
+		if (cliqueSplitSize != null)
+			pgc.setCliqueSplitSize(cliqueSplitSize);
+		
 		
 		if (classIds != null && classIds.size() > 0) {
 			Collector collector;

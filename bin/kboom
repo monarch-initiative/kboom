@@ -58,11 +58,11 @@ then
 	JAVAARGS="$JAVAARGS '${OPTION}'"
     done
 else
-    if [ $OWLTOOLS_MEMORY ]
+    if [ $KBOOM_MEMORY ]
     then
-        JAVAARGS="$JAVAARGS -Xmx$OWLTOOLS_MEMORY"
+        JAVAARGS="$JAVAARGS -Xmx$KBOOM_MEMORY"
     else
-        JAVAARGS="$JAVAARGS -Xmx6G"
+        JAVAARGS="$JAVAARGS -Xmx8G"
     fi
 fi
 

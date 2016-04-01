@@ -411,21 +411,23 @@ public class ProbabilisticGraphCalculator {
 		Double initialProbability = 1.0;
 		Set<OWLAxiom> additionalLogicalAxioms = new HashSet<OWLAxiom>();
 		if (cliqSoln.numberOfProbabilisticEdges > maxProbabilisticEdges) {
+			int nReduced = 0;
 			while (sg.getEdges().size() > maxProbabilisticEdges) {
-				LOG.info("REDUCING: ENTITIES: "+n.getEntities().size()+" PR_EDGES: "+sg.getEdges().size()+" LOG_EDGES: "+sg.getLogicalEdges().size());
+				LOG.info("REDUCING ENTITIES: "+n.getEntities().size()+" PR_EDGES: "+sg.getEdges().size()+" LOG_EDGES: "+sg.getLogicalEdges().size());
 				initialProbability *= reduceClique(sg, additionalLogicalAxioms);
-				LOG.info(" INIT_PR: "+initialProbability);
-				LOG.info(" NEW_PR_EDGES: "+sg.getEdges().size()+" :: "+sg.getEdges());
-				LOG.info(" NEW_LOGICAL_EDGES: "+sg.getLogicalEdges().size()+" :: "+
+				LOG.info(" New Pr: "+initialProbability);
+				LOG.debug(" NEW_PR_EDGES: "+sg.getEdges().size()+" :: "+sg.getEdges());
+				LOG.debug(" NEW_LOGICAL_EDGES: "+sg.getLogicalEdges().size()+" :: "+
 						render(sg.getLogicalEdges()));
-				cliqSoln.messages.add("Used heuristic to estimate some probabilistic edges - confidence may be negative");
 				//			if (sg.getEdges().size() > maxProbabilisticEdges) {
 				//				LOG.info("STILL TOO MANY, GIVING UP: "+n.getEntities().size());
 				//				return cliqSoln;
 				//			}
 				// must be recalculated
 				calculateEdgeProbabilityMatrix(sg);
+				nReduced++;
 			}
+			cliqSoln.messages.add("Used heuristic to estimate some probabilistic edges - confidence may be negative. Reduced: "+nReduced);
 		}
 
 		List<ProbabilisticEdge> edges =  sg.getEdges();
@@ -609,8 +611,9 @@ public class ProbabilisticGraphCalculator {
 			numValidCombos++;
 		}
 
-
+		LOG.info("NUM VALID COMBOS:"+numValidCombos);
 		if (numValidCombos == 0) {
+			LOG.error("UNSOLVABLE");
 			cliqSoln.messages.add("UNSATISFIABLE");
 			cliqSoln.solved = false;
 			cliqSoln.probability = 0.0;
@@ -623,7 +626,6 @@ public class ProbabilisticGraphCalculator {
 		double finalPr = maxJointProbability / sumOfJointProbabilities;
 		LOG.info("MAX_JOINT_PR:"+maxJointProbability);
 		LOG.info("ADJUSTED:"+finalPr);
-		LOG.info("NUM VALID COMBOS:"+numValidCombos);
 		LOG.info("BEST: "+render(currentBestCombinationOfAxioms));
 		cliqSoln.probability = finalPr;
 		List<Double> vals = new ArrayList<Double>(stateScoreMap.values());
@@ -811,7 +813,8 @@ public class ProbabilisticGraphCalculator {
 			sg.getLogicalEdges().add(ax); // translate the probabilistic edge to a logical edge
 		}
 		sg.getEdges().remove(e);
-		LOG.info("PR EDGE: " + e + " ==> LOGICAL EDGE: "+render(ax));
+		// TODO - test this does not lead to unsatisfiability
+		LOG.info("Translating Pe Edge: " + e + " ==> LOGICAL EDGE: "+render(ax));
 		return pr;
 	}
 
