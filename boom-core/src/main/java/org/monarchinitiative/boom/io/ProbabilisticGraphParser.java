@@ -63,7 +63,7 @@ public class ProbabilisticGraphParser {
 					Double.parseDouble(vs[3]),
 					Double.parseDouble(vs[4]),
 					Double.parseDouble(vs[5]));
-			pg.getEdges().add(e);
+			pg.getProbabilisticEdges().add(e);
 					
 		}
 		pg.collapseReciprocals();

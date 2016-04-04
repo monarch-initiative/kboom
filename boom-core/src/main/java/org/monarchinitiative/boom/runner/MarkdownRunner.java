@@ -33,6 +33,7 @@ public class MarkdownRunner {
 		super();
 		this.ontology = ontology;
 		this.pg = pg;
+		pg.calculateEdgeProbabilityMatrix(ontology.getOWLOntologyManager().getOWLDataFactory());
 		
 		LabelProvider provider = new LabelProvider(ontology);
 		renderer = new ManchesterOWLSyntaxOWLObjectRendererImpl();
@@ -49,7 +50,7 @@ public class MarkdownRunner {
 	
 	public Set<CliqueSolution> runAll(ProbabilisticGraphCalculator pgp ) throws OWLOntologyCreationException, IOException {
 		
-		pgp.setGraph(pg);
+		pgp.setProbabilisticGraph(pg);
 		Set<CliqueSolution> rpts = pgp.solveAllCliques();
 		
 		for (CliqueSolution cs : rpts) {
@@ -66,7 +67,7 @@ public class MarkdownRunner {
 	}
 	
 	public String render(CliqueSolution cs) {
-		CliqueSolutionDotWriter dw = new CliqueSolutionDotWriter(cs, ontology);
+		CliqueSolutionDotWriter dw = new CliqueSolutionDotWriter(cs, ontology, pg);
 		String png;
 		try {
 			png = dw.renderToFile(imageFilesPath);
@@ -75,10 +76,14 @@ public class MarkdownRunner {
 			String stats = " * __SIZE__=" + cs.size+" ("+cs.axioms.size()+" new axioms) ";
 			String link = "[img]("+png+")";
 			//String axioms = cs.axioms.stream().map( (ax) -> " * " + LabelUtil.render(ax, ontology) + "\n" ).collect(Collectors.joining(""));
+			String messages = cs.messages.stream().map( (m) -> " * MESSAGE: " + m + "\n" ).collect(Collectors.joining(""));
 			String members = cs.classes.stream().map( (c) -> " * MEMBER: " + renderer.render(c) + "\n" ).collect(Collectors.joining(""));
-			String axioms = cs.axioms.stream().map( (ax) -> " * " + renderer.render(ax) + "\n" ).collect(Collectors.joining(""));
+			String axioms = cs.axioms.stream().map( (ax) -> " * " + 
+					renderer.render(ax) + 
+					" Pr= " + pg.getAxiomPriorProbability(ax) +
+					"\n" ).collect(Collectors.joining(""));
 			
-			return header + prStats + "\n" + stats + "\n" + link + "\n" + members + axioms;
+			return header + prStats + "\n" + stats + "\n" + link + "\n" + members + messages + axioms;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

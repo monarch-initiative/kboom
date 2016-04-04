@@ -62,7 +62,7 @@ else
     then
         JAVAARGS="$JAVAARGS -Xmx$KBOOM_MEMORY"
     else
-        JAVAARGS="$JAVAARGS -Xmx8G"
+        JAVAARGS="$JAVAARGS -Xmx12G"
     fi
 fi
 

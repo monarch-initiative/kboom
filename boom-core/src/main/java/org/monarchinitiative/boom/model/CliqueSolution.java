@@ -23,11 +23,12 @@ public class CliqueSolution {
 	@Expose public String cliqueId;
 	@Expose public Set<String> members;
 	@Expose public int size;
-	@Expose public int numberOfProbabilisticEdges;
+	@Expose public int initialNumberOfProbabilisticEdges;
 	@Expose public Double probability;
 	@Expose public Double confidence;
 	@Expose public Boolean solved;
 	@Expose public List<String> messages = new ArrayList<String>();
+	@Expose public long timeToSolve;
 	
 	public Set<OWLClass> classes = new HashSet<>();
 	public Set<OWLAxiom> axioms = new HashSet<>();

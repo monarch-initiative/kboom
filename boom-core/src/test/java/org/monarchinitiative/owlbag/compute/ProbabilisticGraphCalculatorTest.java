@@ -14,6 +14,7 @@ import org.monarchinitiative.boom.compute.ProbabilisticGraphCalculator;
 import org.monarchinitiative.boom.io.OWLLoader;
 import org.monarchinitiative.boom.io.ProbabilisticGraphParser;
 import org.monarchinitiative.boom.model.CliqueSolution;
+import org.monarchinitiative.boom.model.ProbabilisticEdge;
 import org.monarchinitiative.boom.model.ProbabilisticGraph;
 import org.monarchinitiative.boom.runner.MarkdownRunner;
 import org.obolibrary.oboformat.parser.OBOFormatParserException;
@@ -24,6 +25,7 @@ import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
+import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -72,6 +74,80 @@ public class ProbabilisticGraphCalculatorTest {
 
 				);
 	}
+	
+	@Test
+	public void testUnsatFromGreedy() throws OWLOntologyCreationException, OBOFormatParserException, IOException, OWLOntologyStorageException {
+		// The greedy clique reduction strategy has the possibility of introducing
+		// unsatisfiable states.
+		// Here we assign OMIM:010 high probabilities of being equivalent to both X:3 and X:2
+
+		runUsingResources("basic.obo", "ptable-unsat-clique-test.tsv", "greedy-resolved.owl",
+				subclass("OMIM_001", "Z_3"),
+				subclass("OMIM_002", "Z_3"),
+				subclass("OMIM_003", "Z_3"),
+				subclass("OMIM_004", "Z_3"),
+				subclass("OMIM_005", "Z_3"),
+				subclass("OMIM_006", "Z_3"),
+				subclass("OMIM_007", "Z_3"),
+				subclass("OMIM_008", "Z_3"),
+				subclass("OMIM_009", "Z_3"),
+				subclass("OMIM_010", "Z_3"),
+				
+				// OMIM_010 has high prior for both X_2 and X_3;
+				// X_3 has higher prob than X_2
+				// assigning both would result in an invalid ontology
+				equiv("OMIM_010", "X_3"),
+				subclass("X_3", "Z_3"),
+				// --
+
+				subclass("Z_2b1a", "Y_2b1"),
+				subclass("Z_2b1b", "Y_2b1"),
+				equiv("Z_2b1c", "Y_2b1"), 
+
+				subclass("Z_2a", "X_2"),
+				equiv("Y_1", "X_1"),
+				equiv("Y_2", "X_2"),
+				equiv("Y_2", "Z_2")
+
+				);
+	}
+
+	@Test
+	public void testUnsatFromGreedy2() throws OWLOntologyCreationException, OBOFormatParserException, IOException, OWLOntologyStorageException {
+		// The greedy clique reduction strategy has the possibility of introducing
+		// unsatisfiable states.
+		// Here we assign OMIM:010 high probabilities of being equivalent to both X:3 and X:2
+
+		runUsingResources("basic.obo", "ptable-unsat-clique-test2.tsv", "greedy2-resolved.owl",
+				subclass("OMIM_001", "Z_3"),
+				subclass("OMIM_002", "Z_3"),
+				subclass("OMIM_003", "Z_3"),
+				subclass("OMIM_004", "Z_3"),
+				subclass("OMIM_005", "Z_3"),
+				subclass("OMIM_006", "Z_3"),
+				subclass("OMIM_007", "Z_3"),
+				subclass("OMIM_008", "Z_3"),
+				subclass("OMIM_009", "Z_3"),
+				subclass("OMIM_010", "Z_3"),
+				
+				// OMIM_010 has high prior for both X_2 and X_3;
+				// X_3 has higher prob than X_2
+				// assigning both would result in an invalid ontology
+				equiv("OMIM_010", "X_3"),
+				subclass("X_3", "Z_3"),
+				// --
+
+				subclass("Z_2b1a", "Y_2b1"),
+				subclass("Z_2b1b", "Y_2b1"),
+				equiv("Z_2b1c", "Y_2b1"), 
+
+				subclass("Z_2a", "X_2"),
+				equiv("Y_1", "X_1"),
+				equiv("Y_2", "X_2"),
+				equiv("Y_2", "Z_2")
+
+				);
+	}
 
 	@Test
 	public void testReciprocalConflict() throws OWLOntologyCreationException, OBOFormatParserException, IOException, OWLOntologyStorageException {
@@ -114,6 +190,7 @@ public class ProbabilisticGraphCalculatorTest {
 				0, s.axioms.size());
 	}
 
+	
 	@Test
 	public void testOverride() throws OWLOntologyCreationException, OBOFormatParserException, IOException, OWLOntologyStorageException {
 		// Pr(X1b<Xroot) = 0.01
@@ -126,6 +203,20 @@ public class ProbabilisticGraphCalculatorTest {
 		CliqueSolution s = solns.iterator().next();
 		assertEquals("this clique has a single solution, which is to accept the proposed axiom",
 				0, s.axioms.size());
+	}
+	
+	@Test
+	public void testEntailed() throws OWLOntologyCreationException, OBOFormatParserException, IOException, OWLOntologyStorageException {
+		// Pr(X1b<Xroot) = 0.01
+		// however, this is also specified as a logical axiom
+		ProbabilisticGraphCalculator pgc =
+				loader.createProbabilisticGraphCalculator(getResourceAsUrlPath("basic.obo"),
+				getResourceAsAbsolutePath("ptable-one-solution.tsv"));
+		OWLReasoner reasoner = pgc.getReasonerFactory().createReasoner(pgc.getSourceOntology());
+		Set<ProbabilisticEdge> nonPrEdges = pgc.findEntailedProbabilisticEdges(pgc.getProbabilisticGraph(), reasoner);
+		reasoner.dispose();
+		System.out.println(nonPrEdges);
+		assertEquals(1, nonPrEdges.size());
 	}
 
 	@Test
@@ -179,7 +270,7 @@ public class ProbabilisticGraphCalculatorTest {
 
 	}
 
-	public boolean contains(Set<CliqueSolution> cliques, OWLAxiom ea) {
+	public boolean solutionsContainAxiom(Set<CliqueSolution> cliques, OWLAxiom ea) {
 
 		for (CliqueSolution c : cliques) {
 			for (OWLAxiom a : c.axioms) {
@@ -189,6 +280,7 @@ public class ProbabilisticGraphCalculatorTest {
 		}
 		return false;
 	}
+	
 
 	public Set<CliqueSolution> runUsingResources(String ontFile, String ptableFile, String outpath,
 			OWLAxiom... expectedAxioms) throws OWLOntologyCreationException, OBOFormatParserException, IOException, OWLOntologyStorageException {
@@ -199,7 +291,7 @@ public class ProbabilisticGraphCalculatorTest {
 						);
 		for (OWLAxiom a : expectedAxioms)  {
 			assertTrue("does not contain: "+a,
-					contains(cliques,a));
+					solutionsContainAxiom(cliques,a));
 		}
 
 		return cliques;
@@ -216,7 +308,6 @@ public class ProbabilisticGraphCalculatorTest {
 				parser.parse(ptablePath);
 		MarkdownRunner mdr = new MarkdownRunner(ontology, pg);
 		ProbabilisticGraphCalculator pgp = new ProbabilisticGraphCalculator(ontology);
-		//pgp.setReasonerFactory(new Hermi);
 		pgp.setMaxProbabilisticEdges(5);
 		Set<CliqueSolution> rpts = mdr.runAll(pgp);
 
@@ -245,6 +336,14 @@ public class ProbabilisticGraphCalculatorTest {
 		os.close();
 		return rpts;
 
+	}
+
+	protected static String getResourceAsAbsolutePath(String name) {
+		return getResource(name).getAbsolutePath();
+	}
+	
+	protected static String getResourceAsUrlPath(String name) {
+		return Resources.getResource(name).getFile();
 	}
 
 

@@ -1,8 +1,11 @@
 package org.monarchinitiative.boom.io;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.monarchinitiative.boom.compute.ProbabilisticGraphCalculator;
+import org.monarchinitiative.boom.model.ProbabilisticGraph;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -101,5 +104,15 @@ public class OWLLoader {
 		return manager;
 	}
 
+	public ProbabilisticGraphCalculator createProbabilisticGraphCalculator(String ontFile,
+			String ptablePath) throws OWLOntologyCreationException, IOException {
+		owlOntology = loadOWL(ontFile);
+		ProbabilisticGraphParser parser = 
+				new ProbabilisticGraphParser(owlOntology);
+		ProbabilisticGraph pg = 
+				parser.parse(ptablePath);
+		ProbabilisticGraphCalculator pgc = new ProbabilisticGraphCalculator(owlOntology, pg);
+		return pgc;
+	}
 	
 }

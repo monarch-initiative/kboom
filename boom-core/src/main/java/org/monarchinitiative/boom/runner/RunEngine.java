@@ -9,6 +9,7 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.jena.atlas.logging.Log;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.monarchinitiative.boom.compute.ProbabilisticGraphCalculator;
@@ -57,8 +58,12 @@ public class RunEngine {
 	@Parameter(names = { "--splitSize" }, description = "Maximumum number of probabilistic edges in clique")
 	private Integer cliqueSplitSize = 6;
 
+	@Parameter(names = { "--experimental" }, description = "Experimental")
+	private Boolean isExperimental = false;
+
 	@Parameter(description = "Files")
 	private List<String> files = new ArrayList<>();
+
 
 
 	public static void main(String ... args) throws OWLOntologyCreationException, IOException, OWLOntologyStorageException {
@@ -83,12 +88,14 @@ public class RunEngine {
 
 		ProbabilisticGraphCalculator pgc = new ProbabilisticGraphCalculator(sourceOntology);
 		
-		pgc.setGraph(pg);
+		pgc.setProbabilisticGraph(pg);
 		if (maxProbabilisticEdges != null)
 			pgc.setMaxProbabilisticEdges(maxProbabilisticEdges);
 		if (cliqueSplitSize != null)
 			pgc.setCliqueSplitSize(cliqueSplitSize);
-		
+		pgc.isExperimental = isExperimental;
+		if (isExperimental)
+			System.out.println("EXPERIMENTAL MODE");
 		
 		if (classIds != null && classIds.size() > 0) {
 			Collector collector;
