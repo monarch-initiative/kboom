@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 import org.monarchinitiative.boom.model.CliqueSolution;
 import org.monarchinitiative.boom.model.LabelUtil;
 import org.monarchinitiative.boom.model.ProbabilisticEdge;
@@ -27,6 +28,7 @@ import org.semanticweb.owlapi.reasoner.Node;
  */
 public class CliqueSolutionDotWriter {
 
+	private static Logger LOG = Logger.getLogger(CliqueSolutionDotWriter.class);
 	private CliqueSolution cs;
 	private OWLOntology ontology;
 	private ProbabilisticGraph probabilisticGraph;
@@ -149,15 +151,26 @@ public class CliqueSolutionDotWriter {
 		else if (ax instanceof OWLEquivalentClassesAxiom) {
 			OWLEquivalentClassesAxiom eca = (OWLEquivalentClassesAxiom)ax;
 			List<OWLClassExpression> xs = eca.getClassExpressionsAsList();
-			return renderEdge(
-					getId((OWLClass) xs.get(0)), 
-					getId((OWLClass) xs.get(1)),
-					"ediamond",
-					"solid",
-					"red",
-					penwidth,
-					elabel,
-					", arrowtail=ediamond, dir=both");
+			if (xs.size() == 2) {
+				OWLClassExpression subc = xs.get(0);
+				OWLClassExpression supc = xs.get(1);
+				if (!subc.isAnonymous() &&
+						!supc.isAnonymous()) {
+					return renderEdge(
+							getId((OWLClass) subc), 
+							getId((OWLClass) supc),
+							"ediamond",
+							"solid",
+							"red",
+							penwidth,
+							elabel,
+							", arrowtail=ediamond, dir=both");
+				}
+			}
+			else {
+				LOG.warn("I currently only handle equivalance with arity=2: "+xs);
+				return null;
+			}
 		}
 		return null;
 	}

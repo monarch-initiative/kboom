@@ -61,6 +61,8 @@ public class MarkdownRunner {
 		return rpts;
 		
 	}
+	
+
 
 	public String render(Set<CliqueSolution> rpts) {
 		return rpts.stream().map( (cs) -> render(cs) ).collect(Collectors.joining());
