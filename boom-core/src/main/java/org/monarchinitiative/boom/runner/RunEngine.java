@@ -46,7 +46,7 @@ public class RunEngine {
 	@Parameter(names = { "-t", "--table"}, description = "Path to TSV of probability table")
 	private String ptableFile;
 
-	@Parameter(names = { "-m", "--markdown"}, description = "Path tooutput markdown file")
+	@Parameter(names = { "-m", "--markdown"}, description = "Path to output markdown file")
 	private String mdOutputFile;
 
 	@Parameter(names = { "-n", "--new"}, description = "Make new ontology")
@@ -55,7 +55,7 @@ public class RunEngine {
 	@Parameter(names = { "--max" }, description = "Maximumum number of probabilistic edges in clique")
 	private Integer maxProbabilisticEdges = 9;
 
-	@Parameter(names = { "--splitSize" }, description = "Maximumum number of probabilistic edges in clique")
+	@Parameter(names = { "--splitSize" }, description = "Threshold at which heuristic procedure is used to split clique")
 	private Integer cliqueSplitSize = 6;
 
 	@Parameter(names = { "--experimental" }, description = "Experimental")

@@ -206,6 +206,19 @@ public class ProbabilisticGraphCalculatorTest {
 	}
 	
 	@Test
+	public void testCaseXlid() throws OWLOntologyCreationException, OBOFormatParserException, IOException, OWLOntologyStorageException {
+		// Pr(X1b<Xroot) = 0.01
+		// however, this is also specified as a logical axiom
+		
+		Set<CliqueSolution> solns = 
+				runUsingResources("cases/xlid.obo", "cases/xlid-ptable.tsv", "foo.owl"
+						);
+		long nFailed = solns.stream().filter(s -> !s.solved).count();
+		assertEquals(0, nFailed);
+	}
+
+	
+	@Test
 	public void testEntailed() throws OWLOntologyCreationException, OBOFormatParserException, IOException, OWLOntologyStorageException {
 		// Pr(X1b<Xroot) = 0.01
 		// however, this is also specified as a logical axiom

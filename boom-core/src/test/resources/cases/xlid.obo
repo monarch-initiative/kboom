@@ -1,0 +1,805 @@
+format-version: 1.2
+ontology: doid
+subsetdef: DO_MGI_slim "DO_MGI_slim"
+subsetdef: DO_cancer_slim "DO cancer slim"
+subsetdef: DO_rare_slim "DO_rare_slim"
+subsetdef: GOLD "GOLD"
+subsetdef: MEDIC-Slim "MEDIC (disease) slim"
+subsetdef: NCIthesaurus "NCIt"
+subsetdef: TopNodes_DOcancerslim "TopNodes_DOcancerslim"
+subsetdef: gram-negative_bacterial_infectious_disease "gram-negative bacterial infectious disease"
+subsetdef: gram-positive_bacterial_infectious_disease "gram-positive bacterial infectious disease"
+subsetdef: mesh_antislim "MESH antislim"
+subsetdef: sexually_transmitted_infectious_disease "sexually transmitted infectious disease"
+subsetdef: tick-borne_infectious_disease "tick-borne infectious disease"
+subsetdef: zoonotic_infectious_disease "zoonotic infectious disease"
+
+[Term]
+id: DOID:0060037
+name: developmental disorder of mental health
+namespace: disease_ontology
+def: "A disease of mental health that occur during a child's developmental period between birth and age 18 resulting in retarding of the child's psychological or physical development." [url:http://en.wikipedia.org/wiki/Developmental_disorders]
+is_a: DOID:150  ! disease of mental health
+
+[Term]
+id: DOID:0060038
+name: specific developmental disorder
+namespace: disease_ontology
+def: "A developmental disorder of mental health that categorizes specific learning disabilities and developmental disorders affecting coordination." [url:http://en.wikipedia.org/wiki/Specific_developmental_disorder]
+is_a: DOID:0060037  ! developmental disorder of mental health
+
+[Term]
+id: DOID:1059
+name: intellectual disability
+namespace: disease_ontology
+def: "A specific developmental disorder that involves significant limitations both in mental functioning and in adaptive behavior such as communicating, taking care of him or herself, and social skills." [url:http://www.aamr.org/content_96.cfm?navID=20, url:http://www.google.com/url?sa=t&source=web&cd=9&ved=0CGEQFjAI&url=http%3A%2F%2Fwww.nichcy.org%2FDisabilities%2FSpecific%2FPages%2FIntellectualDisability.aspx&rct=j&q=%20Search%20Intellectual%20Disability%3A%20Definition%2C%20Classification%2C%20and%20Systems%20of%20Supports%20&ei=_Y7dTJ-JKoX7lweUy837DA&usg=AFQjCNHf5WD4JW8kvTc901MQ6AUr_mRPpQ&sig2=sV1yzHR9plpkHZMXYtd8iA&cad=rja, url:http://www.nichcy.org/disabilities/specific/pages/intellectualdisability.aspx#WhatisID.aspx]
+comment: OMIM mapping submitted by NeuroDevNet. [LS].
+synonym: "MENTAL RETARDATION, AUTOSOMAL RECESSIVE 15" EXACT []
+synonym: "mental retardation" RELATED []
+xref: MESH:D008607
+xref: NCIT:C84392
+xref: Orphanet:183757
+xref: Orphanet:87277
+xref: SCTID:154978008
+xref: SCTID:154979000
+xref: SCTID:1855002
+xref: SCTID:192157003
+xref: SCTID:192557008
+xref: SCTID:268732001
+xref: SCTID:91138005
+xref: UMLS:C0025362
+is_a: DOID:0060038  ! specific developmental disorder
+
+[Term]
+id: DOID:150
+name: disease of mental health
+namespace: disease_ontology
+def: "A disease that involves a psychological or behavioral pattern generally associated with subjective distress or disability that occurs in an individual, and which are not a part of normal development or culture." [url:http://en.wikipedia.org/wiki/Mental_disorder]
+xref: ICD10:F99
+xref: ICD10:F99-F99
+xref: MESH:D001523
+xref: NCIT:C2893
+xref: SCTID:154843007
+xref: SCTID:154971002
+xref: SCTID:154972009
+xref: SCTID:154980002
+xref: SCTID:192637001
+xref: SCTID:192639003
+xref: SCTID:74732009
+xref: UMLS:C0004936
+is_a: DOID:4  ! disease
+
+[Term]
+id: DOID:4
+name: disease
+namespace: disease_ontology
+def: "A disease is a disposition (i) to undergo pathological processes that (ii) exists in an organism because of one or more disorders in that organism." [url:http://ontology.buffalo.edu/medo/Disease_and_Diagnosis.pdf]
+xref: MESH:D004194
+xref: NCIT:C2991
+xref: Orphanet:182222
+xref: Orphanet:377788
+xref: Orphanet:98053
+xref: SCTID:64572001
+xref: UMLS:C0012634
+equivalent_to: Orphanet:C001  ! phenome
+
+[Term]
+id: DOID:630
+name: genetic disease
+namespace: disease_ontology
+def: "A disease that has_material_basis_in genetic variations in the human genome." [url:http://ghr.nlm.nih.gov/]
+xref: MESH:D030342
+xref: NCIT:C3101
+xref: Orphanet:377788
+xref: Orphanet:98053
+xref: SCTID:264530000
+xref: SCTID:32895009
+xref: UMLS:C0019247
+is_a: DOID:4  ! disease
+
+[Term]
+id: DOID:7
+name: disease of anatomical entity
+namespace: disease_ontology
+alt_id: DOID:1
+alt_id: DOID:2
+alt_id: DOID:5
+alt_id: DOID:71
+alt_id: DOID:72
+alt_id: DOID:8
+def: "A disease that manifests in a defined anatomical structure." [DO:wk,ls, http://www2.merriam-webster.com/cgi-bin/mwmednlm?book=Medical&va=anatomic]
+is_a: DOID:4  ! disease
+
+[Term]
+id: DOID:863
+name: nervous system disease
+namespace: disease_ontology
+def: "A disease of anatomical entity that is located_in the central nervous system or located_in the peripheral nervous system." [url:http://en.wikipedia.org/wiki/Nervous_system]
+synonym: "neurologic disease" EXACT []
+synonym: "neurologic disorder" EXACT []
+synonym: "neurological disease" EXACT []
+synonym: "neurological disorder" EXACT []
+xref: ICD10:G00-G99
+xref: ICD10:G98
+xref: ICD10:G98.8
+xref: ICD9:349.9
+xref: MESH:D009422
+xref: NCIT:C26835
+xref: Orphanet:98006
+xref: SCTID:118940003
+xref: SCTID:154981003
+xref: SCTID:155262005
+xref: SCTID:192641002
+xref: SCTID:267679005
+xref: SCTID:286946008
+xref: UMLS:C0027765
+is_a: DOID:7  ! disease of anatomical entity
+
+[Term]
+id: MESH:C537457
+name: Mental retardation-hypotonic facies syndrome, x-linked, 1
+namespace: disease_ontology
+synonym: "Carpenter-Waziri syndrome" RELATED []
+synonym: "Chudley Lowry Hoar syndrome" RELATED []
+synonym: "Chudley mental retardation syndrome" RELATED []
+synonym: "Chudley syndrome 1" RELATED []
+synonym: "Chudley-Lowry Syndrome" RELATED []
+synonym: "Holmes-Gang syndrome" RELATED []
+synonym: "Juberg Marsidi syndrome" RELATED []
+synonym: "Juberg-Marsidi Mental Retardation Syndrome" RELATED []
+synonym: "Juberg-Marsidi syndrome" RELATED []
+synonym: "Mental Retradation, X-linked with Growth Delay, Deafness, Microgenitalism" RELATED []
+synonym: "Mental retardation, x-linked, with growth retardation, deafness, and microgenitalism" RELATED []
+synonym: "Smith-fineman-myers syndrome 1" RELATED []
+synonym: "X-Linked Mental Retardation-Hypotonic Facies Syndrome" RELATED []
+synonym: "X-linked hypogonadism gynecomastia mental retardation" RELATED []
+xref: OMIM:309580
+is_a: MESH:D003638  ! Deafness
+is_a: MESH:D006130  ! Growth Disorders
+is_a: MESH:D007006  ! Hypogonadism
+is_a: MESH:D038901  ! Mental Retardation, X-Linked
+
+[Term]
+id: MESH:D001523
+name: Mental Disorders
+namespace: disease_ontology
+def: "Psychiatric illness or diseases manifested by breakdowns in the adaptational process expressed primarily as abnormalities of thought, feeling, and behavior producing either distress or impairment of function." [MESH:D001523]
+subset: MEDIC-Slim  ! MEDIC (disease) slim
+synonym: "Behavior Disorders" RELATED []
+synonym: "Diagnosis, Psychiatric" RELATED []
+synonym: "Disorder, Mental" RELATED []
+synonym: "Disorder, Severe Mental" RELATED []
+synonym: "Disorders, Behavior" RELATED []
+synonym: "Disorders, Mental" RELATED []
+synonym: "Disorders, Severe Mental" RELATED []
+synonym: "Mental Disorder" RELATED []
+synonym: "Mental Disorder, Severe" RELATED []
+synonym: "Mental Disorders, Severe" RELATED []
+synonym: "Psychiatric Diagnosis" RELATED []
+synonym: "Severe Mental Disorder" RELATED []
+synonym: "Severe Mental Disorders" RELATED []
+
+[Term]
+id: MESH:D003638
+name: Deafness
+namespace: disease_ontology
+def: "A general term for the complete loss of the ability to hear from both ears." [MESH:D003638]
+synonym: "Acquired Deafness" RELATED []
+synonym: "Bilateral Deafness" RELATED []
+synonym: "Complete Hearing Loss" RELATED []
+synonym: "Deaf Mutism" RELATED []
+synonym: "Deaf-Mutism" RELATED []
+synonym: "Deafness, Acquired" RELATED []
+synonym: "Deafness, Bilateral" RELATED []
+synonym: "Deafness, Prelingual" RELATED []
+synonym: "Extreme Hearing Loss" RELATED []
+synonym: "Hearing Loss, Complete" RELATED []
+synonym: "Hearing Loss, Extreme" RELATED []
+synonym: "Prelingual Deafness" RELATED []
+is_a: MESH:D034381  ! Hearing Loss
+
+[Term]
+id: MESH:D004427
+name: Ear Diseases
+namespace: disease_ontology
+def: "Pathological processes of the ear, the hearing, and the equilibrium system of the body." [MESH:D004427]
+synonym: "Disease, Ear" RELATED []
+synonym: "Disease, Otologic" RELATED []
+synonym: "Disease, Otological" RELATED []
+synonym: "Diseases, Ear" RELATED []
+synonym: "Diseases, Otologic" RELATED []
+synonym: "Diseases, Otological" RELATED []
+synonym: "Ear Disease" RELATED []
+synonym: "Otologic Disease" RELATED []
+synonym: "Otologic Diseases" RELATED []
+synonym: "Otological Disease" RELATED []
+synonym: "Otological Diseases" RELATED []
+is_a: MESH:D010038  ! Otorhinolaryngologic Diseases
+
+[Term]
+id: MESH:D004700
+name: Endocrine System Diseases
+namespace: disease_ontology
+def: "Pathological processes of the ENDOCRINE GLANDS, and diseases resulting from abnormal level of available HORMONES." [MESH:D004700]
+subset: MEDIC-Slim  ! MEDIC (disease) slim
+synonym: "Disease, Endocrine" RELATED []
+synonym: "Disease, Endocrine System" RELATED []
+synonym: "Diseases of Endocrine System" RELATED []
+synonym: "Diseases, Endocrine" RELATED []
+synonym: "Diseases, Endocrine System" RELATED []
+synonym: "Endocrine Disease" RELATED []
+synonym: "Endocrine Diseases" RELATED []
+synonym: "Endocrine System Disease" RELATED []
+synonym: "System Disease, Endocrine" RELATED []
+synonym: "System Diseases, Endocrine" RELATED []
+
+[Term]
+id: MESH:D006058
+name: Gonadal Disorders
+namespace: disease_ontology
+def: "Pathological processes of the OVARIES or the TESTES." [MESH:D006058]
+synonym: "Disorder, Gonadal" RELATED []
+synonym: "Disorders, Gonadal" RELATED []
+synonym: "Gonadal Disorder" RELATED []
+is_a: MESH:D004700  ! Endocrine System Diseases
+
+[Term]
+id: MESH:D006130
+name: Growth Disorders
+namespace: disease_ontology
+def: "Deviations from the average values for a specific age and sex in any or all of the following: height, weight, skeletal proportions, osseous development, or maturation of features. Included here are both acceleration and retardation of growth." [MESH:D006130]
+synonym: "Disorder, Growth" RELATED []
+synonym: "Growth Disorder" RELATED []
+synonym: "Growth, Stunted" RELATED []
+synonym: "Stunted Growth" RELATED []
+synonym: "Stunting" RELATED []
+synonym: "Stuntings" RELATED []
+
+[Term]
+id: MESH:D006311
+name: Hearing Disorders
+namespace: disease_ontology
+def: "Conditions that impair the transmission of auditory impulses and information from the level of the ear to the temporal cortices, including the sensorineural pathways." [MESH:D006311]
+synonym: "Distorted Hearing" RELATED []
+synonym: "Dysacusis" RELATED []
+synonym: "Hearing Disorder" RELATED []
+synonym: "Hearing, Distorted" RELATED []
+synonym: "Paracousis" RELATED []
+synonym: "Paracusis" RELATED []
+is_a: MESH:D004427  ! Ear Diseases
+is_a: MESH:D012678  ! Sensation Disorders
+
+[Term]
+id: MESH:D007006
+name: Hypogonadism
+namespace: disease_ontology
+def: "Condition resulting from deficient gonadal functions, such as GAMETOGENESIS and the production of GONADAL STEROID HORMONES. It is characterized by delay in GROWTH, germ cell maturation, and development of secondary sex characteristics. Hypogonadism can be due to a deficiency of GONADOTROPINS (hypogonadotropic hypogonadism) or due to primary gonadal failure (hypergonadotropic hypogonadism)." [MESH:D007006]
+synonym: "Hypergonadotropic Hypogonadism" RELATED []
+synonym: "Hypogonadism, Hypergonadotropic" RELATED []
+synonym: "Hypogonadism, Hypogonadotropic" RELATED []
+synonym: "Hypogonadism, Isolated Hypogonadotropic" RELATED []
+synonym: "Hypogonadotropic Hypogonadism" RELATED []
+is_a: MESH:D006058  ! Gonadal Disorders
+
+[Term]
+id: MESH:D008607
+name: Intellectual Disability
+namespace: disease_ontology
+def: "Subnormal intellectual functioning which originates during the developmental period. This has multiple potential etiologies, including genetic defects and perinatal insults. Intelligence quotient (IQ) scores are commonly used to determine whether an individual has an intellectual disability. IQ scores between 70 and 79 are in the borderline range. Scores below 67 are in the disabled range. (from Joynt, Clinical Neurology, 1992, Ch55, p28)" [MESH:D008607]
+synonym: "Deficiencies, Mental" RELATED []
+synonym: "Deficiency, Mental" RELATED []
+synonym: "Development Disorder, Intellectual" RELATED []
+synonym: "Development Disorders, Intellectual" RELATED []
+synonym: "Disabilities, Intellectual" RELATED []
+synonym: "Disability, Intellectual" RELATED []
+synonym: "Disorder, Intellectual Development" RELATED []
+synonym: "Disorders, Intellectual Development" RELATED []
+synonym: "Idiocy" RELATED []
+synonym: "Intellectual Development Disorder" RELATED []
+synonym: "Intellectual Development Disorders" RELATED []
+synonym: "Intellectual Disabilities" RELATED []
+synonym: "Mental Deficiencies" RELATED []
+synonym: "Mental Deficiency" RELATED []
+synonym: "Mental Retardation" RELATED []
+synonym: "Mental Retardation, Psychosocial" RELATED []
+synonym: "Mental Retardations, Psychosocial" RELATED []
+synonym: "Psychosocial Mental Retardation" RELATED []
+synonym: "Psychosocial Mental Retardations" RELATED []
+synonym: "Retardation, Mental" RELATED []
+synonym: "Retardation, Psychosocial Mental" RELATED []
+synonym: "Retardations, Psychosocial Mental" RELATED []
+is_a: MESH:D019954  ! Neurobehavioral Manifestations
+is_a: MESH:D065886  ! Neurodevelopmental Disorders
+
+[Term]
+id: MESH:D009358
+name: Congenital, Hereditary, and Neonatal Diseases and Abnormalities
+namespace: disease_ontology
+def: "Diseases existing at birth and often before birth, or that develop during the first month of life (INFANT, NEWBORN, DISEASES), regardless of causation. Of these diseases, those characterized by structural deformities are termed CONGENITAL ABNORMALITIES." [MESH:D009358]
+synonym: "Congenital Disorder" RELATED []
+synonym: "Congenital Disorders" RELATED []
+synonym: "Disorder, Congenital" RELATED []
+synonym: "Disorders, Congenital" RELATED []
+synonym: "Neonatal Diseases and Abnormalities" RELATED []
+
+[Term]
+id: MESH:D009422
+name: Nervous System Diseases
+namespace: disease_ontology
+def: "Diseases of the central and peripheral nervous system. This includes disorders of the brain, spinal cord, cranial nerves, peripheral nerves, nerve roots, autonomic nervous system, neuromuscular junction, and muscle." [MESH:D009422]
+subset: MEDIC-Slim  ! MEDIC (disease) slim
+synonym: "Disease, Nervous System" RELATED []
+synonym: "Diseases, Nervous System" RELATED []
+synonym: "Disorder, Nervous System" RELATED []
+synonym: "Disorder, Neurologic" RELATED []
+synonym: "Disorder, Neurological" RELATED []
+synonym: "Disorders, Nervous System" RELATED []
+synonym: "Disorders, Neurologic" RELATED []
+synonym: "Disorders, Neurological" RELATED []
+synonym: "Nervous System Disease" RELATED []
+synonym: "Nervous System Disorder" RELATED []
+synonym: "Nervous System Disorders" RELATED []
+synonym: "Neurologic Disorder" RELATED []
+synonym: "Neurologic Disorders" RELATED []
+synonym: "Neurological Disorder" RELATED []
+synonym: "Neurological Disorders" RELATED []
+
+[Term]
+id: MESH:D009461
+name: Neurologic Manifestations
+namespace: disease_ontology
+def: "Clinical signs and symptoms caused by nervous system injury or dysfunction." [MESH:D009461]
+synonym: "Deficit, Focal Neurologic" RELATED []
+synonym: "Deficit, Neurologic" RELATED []
+synonym: "Deficits, Focal Neurologic" RELATED []
+synonym: "Deficits, Neurologic" RELATED []
+synonym: "Dysfunction, Neurologic" RELATED []
+synonym: "Dysfunctions, Neurologic" RELATED []
+synonym: "Finding, Neurologic" RELATED []
+synonym: "Findings, Neurologic" RELATED []
+synonym: "Focal Neurologic Deficit" RELATED []
+synonym: "Focal Neurologic Deficits" RELATED []
+synonym: "Manifestation, Neurologic" RELATED []
+synonym: "Manifestation, Neurological" RELATED []
+synonym: "Manifestations, Neurologic" RELATED []
+synonym: "Manifestations, Neurological" RELATED []
+synonym: "Neurologic Deficit" RELATED []
+synonym: "Neurologic Deficit, Focal" RELATED []
+synonym: "Neurologic Deficits" RELATED []
+synonym: "Neurologic Deficits, Focal" RELATED []
+synonym: "Neurologic Dysfunction" RELATED []
+synonym: "Neurologic Dysfunctions" RELATED []
+synonym: "Neurologic Finding" RELATED []
+synonym: "Neurologic Findings" RELATED []
+synonym: "Neurologic Manifestation" RELATED []
+synonym: "Neurologic Sign" RELATED []
+synonym: "Neurologic Signs" RELATED []
+synonym: "Neurologic Signs and Symptoms" RELATED []
+synonym: "Neurologic Symptom" RELATED []
+synonym: "Neurologic Symptoms" RELATED []
+synonym: "Neurological Manifestation" RELATED []
+synonym: "Neurological Manifestations" RELATED []
+synonym: "Sign, Neurologic" RELATED []
+synonym: "Signs, Neurologic" RELATED []
+synonym: "Symptom, Neurologic" RELATED []
+synonym: "Symptoms, Neurologic" RELATED []
+is_a: MESH:D009422  ! Nervous System Diseases
+
+[Term]
+id: MESH:D010038
+name: Otorhinolaryngologic Diseases
+namespace: disease_ontology
+def: "Pathological processes of the ear, the nose, and the throat, also known as the ENT diseases." [MESH:D010038]
+subset: MEDIC-Slim  ! MEDIC (disease) slim
+synonym: "Disease, ENT" RELATED []
+synonym: "Disease, Otolaryngologic" RELATED []
+synonym: "Disease, Otolaryngological" RELATED []
+synonym: "Disease, Otorhinolaryngologic" RELATED []
+synonym: "Disease, Otorhinolaryngological" RELATED []
+synonym: "Diseases, ENT" RELATED []
+synonym: "Diseases, Otolaryngologic" RELATED []
+synonym: "Diseases, Otolaryngological" RELATED []
+synonym: "Diseases, Otorhinolaryngologic" RELATED []
+synonym: "Diseases, Otorhinolaryngological" RELATED []
+synonym: "ENT Disease" RELATED []
+synonym: "ENT Diseases" RELATED []
+synonym: "Otolaryngologic Disease" RELATED []
+synonym: "Otolaryngologic Diseases" RELATED []
+synonym: "Otolaryngological Disease" RELATED []
+synonym: "Otolaryngological Diseases" RELATED []
+synonym: "Otorhinolaryngologic Disease" RELATED []
+synonym: "Otorhinolaryngological Disease" RELATED []
+synonym: "Otorhinolaryngological Diseases" RELATED []
+
+[Term]
+id: MESH:D012678
+name: Sensation Disorders
+namespace: disease_ontology
+def: "Disorders of the special senses (i.e., VISION; HEARING; TASTE; and SMELL) or somatosensory system (i.e., afferent components of the PERIPHERAL NERVOUS SYSTEM)." [MESH:D012678]
+synonym: "Sensation Disorder" RELATED []
+synonym: "Senses Disorder, Special" RELATED []
+synonym: "Senses Disorders, Special" RELATED []
+synonym: "Sensory Disorder" RELATED []
+synonym: "Sensory Disorders" RELATED []
+synonym: "Special Senses Disorder" RELATED []
+synonym: "Special Senses Disorders" RELATED []
+is_a: MESH:D009461  ! Neurologic Manifestations
+
+[Term]
+id: MESH:D019636
+name: Neurodegenerative Diseases
+namespace: disease_ontology
+def: "Hereditary and sporadic conditions which are characterized by progressive nervous system dysfunction. These disorders are often associated with atrophy of the affected central or peripheral nervous system structures." [MESH:D019636]
+synonym: "Degenerative Condition, Neurologic" RELATED []
+synonym: "Degenerative Conditions, Neurologic" RELATED []
+synonym: "Degenerative Diseases, Central Nervous System" RELATED []
+synonym: "Degenerative Diseases, Nervous System" RELATED []
+synonym: "Degenerative Diseases, Neurologic" RELATED []
+synonym: "Degenerative Diseases, Spinal Cord" RELATED []
+synonym: "Degenerative Neurologic Disease" RELATED []
+synonym: "Degenerative Neurologic Diseases" RELATED []
+synonym: "Degenerative Neurologic Disorder" RELATED []
+synonym: "Degenerative Neurologic Disorders" RELATED []
+synonym: "Nervous System Degenerative Diseases" RELATED []
+synonym: "Neurodegenerative Disease" RELATED []
+synonym: "Neurodegenerative Disorder" RELATED []
+synonym: "Neurodegenerative Disorders" RELATED []
+synonym: "Neurologic Degenerative Condition" RELATED []
+synonym: "Neurologic Degenerative Conditions" RELATED []
+synonym: "Neurologic Degenerative Disease" RELATED []
+synonym: "Neurologic Degenerative Diseases" RELATED []
+synonym: "Neurologic Disease, Degenerative" RELATED []
+synonym: "Neurologic Diseases, Degenerative" RELATED []
+synonym: "Neurologic Disorder, Degenerative" RELATED []
+synonym: "Neurologic Disorders, Degenerative" RELATED []
+is_a: MESH:D009422  ! Nervous System Diseases
+
+[Term]
+id: MESH:D019954
+name: Neurobehavioral Manifestations
+namespace: disease_ontology
+def: "Signs and symptoms of higher cortical dysfunction caused by organic conditions. These include certain behavioral alterations and impairments of skills involved in the acquisition, processing, and utilization of knowledge or information." [MESH:D019954]
+synonym: "Cognitive Manifestation" RELATED []
+synonym: "Cognitive Manifestations" RELATED []
+synonym: "Cognitive Symptom" RELATED []
+synonym: "Cognitive Symptoms" RELATED []
+synonym: "Manifestation, Cognitive" RELATED []
+synonym: "Manifestation, Neurobehavioral" RELATED []
+synonym: "Manifestations, Cognitive" RELATED []
+synonym: "Manifestations, Neurobehavioral" RELATED []
+synonym: "Neurobehavioral Manifestation" RELATED []
+synonym: "Neurobehavioral Signs and Symptoms" RELATED []
+synonym: "Signs and Symptoms, Neurobehavioral" RELATED []
+synonym: "Symptom, Cognitive" RELATED []
+synonym: "Symptoms, Cognitive" RELATED []
+is_a: MESH:D009461  ! Neurologic Manifestations
+
+[Term]
+id: MESH:D020271
+name: Heredodegenerative Disorders, Nervous System
+namespace: disease_ontology
+def: "Inherited disorders characterized by progressive atrophy and dysfunction of anatomically or physiologically related neurologic systems." [MESH:D020271]
+synonym: "Degenerative Disease, Nervous System, Hereditary" RELATED []
+synonym: "Degenerative Hereditary Diseases, Nervous System" RELATED []
+synonym: "Degenerative Hereditary Disorders, Nervous System" RELATED []
+synonym: "Disease, Hereditary Neurodegenerative" RELATED []
+synonym: "Disease, Neurodegenerative Hereditary" RELATED []
+synonym: "Diseases, Hereditary Neurodegenerative" RELATED []
+synonym: "Diseases, Neurodegenerative Hereditary" RELATED []
+synonym: "Hereditary Degenerative Disorders, Nervous System" RELATED []
+synonym: "Hereditary Disease, Neurodegenerative" RELATED []
+synonym: "Hereditary Diseases, Neurodegenerative" RELATED []
+synonym: "Hereditary Neurodegenerative Disease" RELATED []
+synonym: "Hereditary Neurodegenerative Diseases" RELATED []
+synonym: "Hereditary-Degenerative Disorders, Nervous System" RELATED []
+synonym: "Nervous System Degenerative Hereditary Diseases" RELATED []
+synonym: "Nervous System Diseases, Degenerative, Hereditary" RELATED []
+synonym: "Nervous System Hereditary Degenerative Diseases" RELATED []
+synonym: "Neurodegenerative Disease, Hereditary" RELATED []
+synonym: "Neurodegenerative Diseases, Hereditary" RELATED []
+synonym: "Neurodegenerative Hereditary Disease" RELATED []
+synonym: "Neurodegenerative Hereditary Diseases" RELATED []
+is_a: MESH:D019636  ! Neurodegenerative Diseases
+is_a: MESH:D030342  ! Genetic Diseases, Inborn
+
+[Term]
+id: MESH:D030342
+name: Genetic Diseases, Inborn
+namespace: disease_ontology
+def: "Diseases that are caused by genetic mutations present during embryo or fetal development, although they may be observed later in life. The mutations may be inherited from a parent's genome or they may be acquired in utero." [MESH:D030342]
+subset: MEDIC-Slim  ! MEDIC (disease) slim
+synonym: "Defect, Single-Gene" RELATED []
+synonym: "Defects, Single-Gene" RELATED []
+synonym: "Disease, Hereditary" RELATED []
+synonym: "Disease, Inborn Genetic" RELATED []
+synonym: "Diseases, Hereditary" RELATED []
+synonym: "Diseases, Inborn Genetic" RELATED []
+synonym: "Genetic Disease, Inborn" RELATED []
+synonym: "Hereditary Disease" RELATED []
+synonym: "Hereditary Diseases" RELATED []
+synonym: "Inborn Genetic Disease" RELATED []
+synonym: "Inborn Genetic Diseases" RELATED []
+synonym: "Single Gene Defects" RELATED []
+synonym: "Single-Gene Defect" RELATED []
+synonym: "Single-Gene Defects" RELATED []
+is_a: MESH:D009358  ! Congenital, Hereditary, and Neonatal Diseases and Abnormalities
+
+[Term]
+id: MESH:D034381
+name: Hearing Loss
+namespace: disease_ontology
+def: "A general term for the complete or partial loss of the ability to hear from one or both ears." [MESH:D034381]
+synonym: "Hearing Impairment" RELATED []
+synonym: "Hypoacuses" RELATED []
+synonym: "Hypoacusis" RELATED []
+synonym: "Loss, Hearing" RELATED []
+is_a: MESH:D006311  ! Hearing Disorders
+
+[Term]
+id: MESH:D038901
+name: Mental Retardation, X-Linked
+namespace: disease_ontology
+def: "A class of genetic disorders resulting in INTELLECTUAL DISABILITY that is associated either with mutations of GENES located on the X CHROMOSOME or aberrations in the structure of the X chromosome (SEX CHROMOSOME ABERRATIONS)." [MESH:D038901]
+synonym: "Mental Retardation, X Linked" RELATED []
+synonym: "Retardation, X-Linked Mental" RELATED []
+synonym: "X Linked Mental Retardation" RELATED []
+synonym: "X Linked Mental Retardation Disorders" RELATED []
+synonym: "X Linked Mental Retardation Syndromes" RELATED []
+synonym: "X-Linked Mental Retardation" RELATED []
+synonym: "X-Linked Mental Retardation Disorders" RELATED []
+synonym: "X-Linked Mental Retardation Syndromes" RELATED []
+synonym: "X-Linked Mental Retardations" RELATED []
+is_a: MESH:D008607  ! Intellectual Disability
+is_a: MESH:D020271  ! Heredodegenerative Disorders, Nervous System
+is_a: MESH:D040181  ! Genetic Diseases, X-Linked
+
+[Term]
+id: MESH:D040181
+name: Genetic Diseases, X-Linked
+namespace: disease_ontology
+def: "Genetic diseases that are linked to gene mutations on the X CHROMOSOME in humans (X CHROMOSOME, HUMAN) or the X CHROMOSOME in other species. Included here are animal models of human X-linked diseases." [MESH:D040181]
+synonym: "Disease, X-Linked Genetic" RELATED []
+synonym: "Diseases, X-Linked Genetic" RELATED []
+synonym: "Genetic Disease, X-Linked" RELATED []
+synonym: "Genetic Diseases, X Chromosome Linked" RELATED []
+synonym: "Genetic Diseases, X Linked" RELATED []
+synonym: "Genetic Diseases, X-Chromosome Linked" RELATED []
+synonym: "X Linked Genetic Diseases" RELATED []
+synonym: "X-Linked Genetic Disease" RELATED []
+synonym: "X-Linked Genetic Diseases" RELATED []
+is_a: MESH:D030342  ! Genetic Diseases, Inborn
+
+[Term]
+id: MESH:D065886
+name: Neurodevelopmental Disorders
+namespace: disease_ontology
+def: "These are a group of conditions with onset in the developmental period. The disorders typically manifest early in development, often before the child enters grade school, and are characterized by developmental deficits that produce impairments of personal, social, academic, or occupational functioning.  (From DSM-V)." [MESH:D065886]
+synonym: "Child Mental Disorder" RELATED []
+synonym: "Child Mental Disorders" RELATED []
+synonym: "Disorder, Child Mental" RELATED []
+synonym: "Disorder, Neurodevelopmental" RELATED []
+synonym: "Disorders Usually Diagnosed in Infancy, Childhood or Adolescence" RELATED []
+synonym: "Disorders, Child Mental" RELATED []
+synonym: "Disorders, Neurodevelopmental" RELATED []
+synonym: "Mental Disorder, Child" RELATED []
+synonym: "Mental Disorders Diagnosed in Childhood" RELATED []
+synonym: "Mental Disorders, Child" RELATED []
+synonym: "Neurodevelopmental Disorder" RELATED []
+is_a: MESH:D001523  ! Mental Disorders
+
+[Term]
+id: OMIM:309580
+name: Mental Retardation-Hypotonic Facies Syndrome, X-Linked, 1
+namespace: disease_ontology
+def: "The term 'X-linked mental retardation-hypotonic facies syndrome' comprises several syndromes previously reported separately. These include Juberg-Marsidi, Carpenter-Waziri, Holmes-Gang, and Smith-Fineman-Myers syndromes as well as 1 family with X-linked mental retardation with spastic paraplegia. All these syndromes were found to be caused by mutation in the XH2 gene and are characterized primarily by severe mental retardation, dysmorphic facies, and a highly skewed X-inactivation pattern in carrier women (\{2:Abidi et al., 2005\}). Other more variable features include hypogonadism, deafness, renal anomalies, and mild skeletal defects.nnX-linked alpha-thalassemia/mental retardation syndrome (ATR-X; OMIM:301040) is an allelic disorder with a similar phenotype with the addition of alpha-thalassemia and Hb H inclusion bodies in erythrocytes." []
+synonym: "Carpenter-Waziri Syndrome" RELATED []
+synonym: "Chudley-Lowry Syndrome" RELATED []
+synonym: "Holmes-Gang Syndrome" RELATED []
+synonym: "Juberg-Marsidi Syndrome" RELATED []
+synonym: "MENTAL RETARDATION-HYPOTONIC FACIES SYNDROME, X-LINKED, 1; MRXHF1" RELATED []
+synonym: "MRXHF1" RELATED []
+synonym: "Mental Retardation, X-Linked, With Growth Retardation, Deafness, and Microgenitalism" RELATED []
+synonym: "Sfms" RELATED []
+synonym: "Smith-Fineman-Myers Syndrome 1" RELATED []
+synonym: "Xlmr-Hypotonic Facies Syndrome" RELATED []
+is_a: DOID:4  ! disease
+
+[Term]
+id: Orphanet:101433
+name: Rare urogenital disease
+namespace: disease_ontology
+subset: Orphanet:377794 
+is_a: Orphanet:C001  ! phenome
+
+[Term]
+id: Orphanet:102283
+name: Multiple congenital anomalies/dysmorphic syndrome-intellectual disability
+namespace: disease_ontology
+subset: Orphanet:377794 
+synonym: "MCA/MR" EXACT []
+synonym: "Multiple congenital anomalies-intellectual disability with or without dysmorphism" EXACT []
+is_a: Orphanet:183530  ! Rare genetic developmental defect during embryogenesis
+is_a: Orphanet:68341  ! Multiple congenital anomalies/dysmorphic syndrome
+
+[Term]
+id: Orphanet:102369
+name: Rare intellectual disability with developmental anomaly
+namespace: disease_ontology
+subset: Orphanet:377794 
+synonym: "Syndromic intellectual disability" EXACT []
+synonym: "Syndromic mental deficiency" EXACT []
+is_a: Orphanet:87277  ! Rare intellectual disability
+
+[Term]
+id: Orphanet:156619
+name: Rare genetic urogenital disease
+namespace: disease_ontology
+subset: Orphanet:377794 
+is_a: Orphanet:C001  ! phenome
+
+[Term]
+id: Orphanet:165707
+name: Syndromic urogenital tract malformation
+namespace: disease_ontology
+subset: Orphanet:377794 
+is_a: Orphanet:156619  ! Rare genetic urogenital disease
+is_a: Orphanet:83001  ! Urogenital tract malformation
+
+[Term]
+id: Orphanet:183530
+name: Rare genetic developmental defect during embryogenesis
+namespace: disease_ontology
+subset: Orphanet:377794 
+is_a: Orphanet:C001  ! phenome
+
+[Term]
+id: Orphanet:183757
+name: Rare genetic intellectual disability
+namespace: disease_ontology
+subset: Orphanet:377794 
+is_a: DOID:1059  ! intellectual disability
+is_a: DOID:630  ! genetic disease
+is_a: Orphanet:71859  ! Rare genetic neurological disorder
+
+[Term]
+id: Orphanet:183763
+name: Rare genetic intellectual disability with developmental anomaly
+namespace: disease_ontology
+subset: Orphanet:377794 
+is_a: Orphanet:183757  ! Rare genetic intellectual disability
+
+[Term]
+id: Orphanet:263355
+name: ATR-X-related syndrome
+namespace: disease_ontology
+subset: Orphanet:377794 
+is_a: Orphanet:102283  ! Multiple congenital anomalies/dysmorphic syndrome-intellectual disability
+is_a: Orphanet:98464  ! X-linked syndromic intellectual disability
+
+[Term]
+id: Orphanet:68341
+name: Multiple congenital anomalies/dysmorphic syndrome
+namespace: disease_ontology
+subset: Orphanet:377794 
+is_a: Orphanet:93890  ! Rare developmental defect during embryogenesis
+
+[Term]
+id: Orphanet:71859
+name: Rare genetic neurological disorder
+namespace: disease_ontology
+subset: Orphanet:377794 
+is_a: Orphanet:C001  ! phenome
+
+[Term]
+id: Orphanet:73220
+name: X-linked intellectual disability - hypotonic face
+namespace: disease_ontology
+subset: Orphanet:377794 
+xref: OMIM:309580
+is_a: Orphanet:263355  ! ATR-X-related syndrome
+
+[Term]
+id: Orphanet:83001
+name: Urogenital tract malformation
+namespace: disease_ontology
+subset: Orphanet:377794 
+is_a: Orphanet:101433  ! Rare urogenital disease
+is_a: Orphanet:93890  ! Rare developmental defect during embryogenesis
+
+[Term]
+id: Orphanet:87277
+name: Rare intellectual disability
+namespace: disease_ontology
+subset: Orphanet:377794 
+is_a: DOID:1059  ! intellectual disability
+is_a: Orphanet:98006  ! Rare neurologic disease
+
+[Term]
+id: Orphanet:93890
+name: Rare developmental defect during embryogenesis
+namespace: disease_ontology
+subset: Orphanet:377794 
+synonym: "Malformation syndrome" EXACT []
+is_a: Orphanet:C001  ! phenome
+
+[Term]
+id: Orphanet:93970
+name: Holmes-Gang syndrome
+namespace: disease_ontology
+def: "Holmes-Gang syndrome is an X-linked mental retardation (XLMR) syndrome belonging to the group of conditions characterised by the association of intellectual deficit with hypotonic facies (Mental retardation, X-linked-hypotonic facies; see this term)." []
+subset: Orphanet:377789 
+xref: ICD10:Q87.0
+xref: OMIM:309580
+is_a: Orphanet:73220  ! X-linked intellectual disability - hypotonic face
+
+[Term]
+id: Orphanet:93971
+name: Chudley-Lowry-Hoar syndrome
+namespace: disease_ontology
+def: "Chudley-Lowry syndrome is an X-linked mental retardation (XLMR) syndrome belonging to the group of conditions characterised by the association of intellectual deficit with hypotonic facies (Mental retardation-hypotonic facies; see this term)." []
+subset: Orphanet:377789 
+synonym: "Chudley-Lowry syndrome" EXACT []
+xref: OMIM:309580
+is_a: Orphanet:73220  ! X-linked intellectual disability - hypotonic face
+
+[Term]
+id: Orphanet:93972
+name: Juberg-Marsidi syndrome
+namespace: disease_ontology
+subset: Orphanet:377789 
+xref: MESH:C537457
+xref: OMIM:309580
+xref: UMLS:C0796003
+is_a: Orphanet:165707  ! Syndromic urogenital tract malformation
+is_a: Orphanet:73220  ! X-linked intellectual disability - hypotonic face
+
+[Term]
+id: Orphanet:93973
+name: Carpenter-Waziri syndrome
+namespace: disease_ontology
+def: "Carpenter-Waziri syndrome is an X-linked mental retardation (XLMR) syndrome belonging to the group of conditions characterised by the association of intellectual deficit with hypotonic facies (Mental retardation, X-linked-hypotonic facies; see this term)." []
+subset: Orphanet:377789 
+xref: OMIM:309580
+is_a: Orphanet:73220  ! X-linked intellectual disability - hypotonic face
+
+[Term]
+id: Orphanet:93974
+name: Smith-Fineman-Myers syndrome
+namespace: disease_ontology
+def: "Smith-Fineman-Myers syndrome (SFMS) is an X-linked mental retardation (XLMR) syndrome belonging to the group of conditions characterised by the association of intellectual deficit with hypotonic facies (Mental retardation, X-linked-hypotonic facies; see this term)." []
+subset: Orphanet:377789 
+xref: OMIM:309580
+is_a: Orphanet:73220  ! X-linked intellectual disability - hypotonic face
+
+[Term]
+id: Orphanet:93975
+name: Renier-Gabreels-Jasper syndrome
+namespace: disease_ontology
+def: "Renier-Gabreels-Jasper syndrome is an X-linked mental retardation (XLMR) syndrome belonging to the group of conditions characterised by the association of intellectual deficit with hypotonic facies (Mental retardation, X-linked-hypotonic facies; see this term)." []
+subset: Orphanet:377789 
+xref: OMIM:309580
+is_a: Orphanet:73220  ! X-linked intellectual disability - hypotonic face
+
+[Term]
+id: Orphanet:98006
+name: Rare neurologic disease
+namespace: disease_ontology
+subset: Orphanet:377794 
+synonym: "Rare nervous system disease" EXACT []
+is_a: DOID:863  ! nervous system disease
+is_a: Orphanet:C001  ! phenome
+
+[Term]
+id: Orphanet:98464
+name: X-linked syndromic intellectual disability
+namespace: disease_ontology
+subset: Orphanet:377794 
+is_a: Orphanet:102369  ! Rare intellectual disability with developmental anomaly
+is_a: Orphanet:183763  ! Rare genetic intellectual disability with developmental anomaly
+
+[Term]
+id: Orphanet:C001
+name: phenome
+namespace: disease_ontology
+def: "A set of phenotypes expressed at the cell, tissue, organ or organism level. It describes the \"physical totality of all traits of an organism or of one of its subsystems\" (Mahner and Kary, 1997)." []
+
