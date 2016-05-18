@@ -4,5 +4,11 @@
 
 For a description see https://github.com/cmungall/kboom-paper
 
+To run:
+
+```
+mvn install
+bin/kboom -t all-ptable.tsv all.owl -o merged.owl
+```
 
 
