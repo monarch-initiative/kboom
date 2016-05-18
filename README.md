@@ -2,7 +2,7 @@
 
 ## BOOM: Bayes OWL Ontology Merging
 
-For a description see https://github.com/cmungall/kboom-paper
+For a description see http://biorxiv.org/content/early/2016/05/18/048843 (or https://github.com/cmungall/kboom-paper)
 
 To run:
 
