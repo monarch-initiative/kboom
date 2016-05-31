@@ -48,7 +48,7 @@ public class MarkdownRunner {
 		return runAll(pgp);
 	}
 	
-	public Set<CliqueSolution> runAll(ProbabilisticGraphCalculator pgp ) throws OWLOntologyCreationException, IOException {
+	public Set<CliqueSolution> runAll(ProbabilisticGraphCalculator pgp) throws OWLOntologyCreationException, IOException {
 		
 		pgp.setProbabilisticGraph(pg);
 		Set<CliqueSolution> rpts = pgp.solveAllCliques();

@@ -3,11 +3,13 @@ package org.monarchinitiative.boom.io;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.monarchinitiative.boom.model.CliqueSolution;
+import org.monarchinitiative.boom.model.EdgeType;
 import org.monarchinitiative.boom.model.LabelUtil;
 import org.monarchinitiative.boom.model.ProbabilisticEdge;
 import org.monarchinitiative.boom.model.ProbabilisticGraph;
@@ -73,7 +75,13 @@ public class CliqueSolutionDotWriter {
 	}
 
 	private String renderNodesInCliques() {
-		return cs.nodes.stream().map( (Node<OWLClass> n) -> renderNode(n) ).collect(Collectors.joining("\n"));
+		if (cs.nodes.size() == 0) {
+			return cs.classes.stream().map( c -> renderClass(c) ).collect(Collectors.joining("\n"));
+
+		}
+		else {
+			return cs.nodes.stream().map( (Node<OWLClass> n) -> renderNode(n) ).collect(Collectors.joining("\n"));
+		}
 	}
 
 	private String renderNode(Node<OWLClass> n) {
@@ -105,7 +113,26 @@ public class CliqueSolutionDotWriter {
 		return cs.subGraph.getProbabilisticEdges().stream().map( (ProbabilisticEdge e) -> renderEdge(e)).collect(Collectors.joining("\n"));
 	}
 
+	private String pct(Double n) {
+		Integer i = (int) (n * 100.0);
+		return i.toString();
+	}
+
 	private String renderEdge(ProbabilisticEdge e) {
+		Map<EdgeType, Double> tm = e.getProbabilityTable().getTypeProbabilityMap();
+
+		String plabel = "";
+		if (!cs.solved) {
+			// showing the prior probability for each state clutters the display;
+			// only do this when there is no solution.
+			// if there is a solution, then one of the states will have been selected,
+			// and the prior probability for this will already be shown (via
+			// renderEdge(OWLAxiom x))
+			plabel = 
+					"("+pct(tm.get(EdgeType.SUBCLASS_OF)) + "-" + 
+							pct(tm.get(EdgeType.SUPERCLASS_OF)) + "-" +
+							pct(tm.get(EdgeType.EQUIVALENT_TO)) + ")";
+		}
 		// probabilistic edges are dotted
 		return renderEdge(
 				getId(getId(e.getSourceClass())), 
@@ -114,8 +141,7 @@ public class CliqueSolutionDotWriter {
 				"dotted",
 				"blue",
 				1,
-				//e.getProbabilityTable().toString(),
-				"",
+				plabel,
 				""); // TODO
 	}
 
@@ -128,7 +154,7 @@ public class CliqueSolutionDotWriter {
 			penwidth = 1;
 		}
 		else {
-			elabel = pr.toString();
+			elabel = pct(pr);
 			penwidth = (int) (1 + pr*10);
 			if (cs.subGraph.getLogicalEdges().contains(ax)) {
 				// the probabilistic edge was turned into a logical edge
