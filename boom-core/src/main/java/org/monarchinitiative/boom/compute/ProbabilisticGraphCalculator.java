@@ -246,10 +246,12 @@ public class ProbabilisticGraphCalculator {
 		// first find any pr edges that are overridden by logical axiom entailments.
 		// note for the mapping scenario, this should only happen when there are
 		// asserted logical axioms across ontologies.
+		// For the MonDO pipeline, this includes the OMIM clusters that are
+		// later made equivalent with DO
 		Set<ProbabilisticEdge> rmEdges = findEntailedProbabilisticEdges(probabilisticGraph, reasoner);
 		if (rmEdges.size() > 0) {
 			for (ProbabilisticEdge e : rmEdges) {
-				LOG.info("Initial prune: "+render(e));
+				LOG.info("Pruning edge with logic entailment: "+render(e));
 			}
 			if (isExperimental) {
 				probabilisticGraph.getProbabilisticEdges().removeAll(rmEdges);
@@ -462,7 +464,9 @@ public class ProbabilisticGraphCalculator {
 
 			int nReduced = 0;
 			while (subPrGraph.getProbabilisticEdges().size() > maxProbabilisticEdges) {
-				LOG.info("REDUCING PrEdges // |N|="+n.getEntities().size()+" PR_EDGES: "+subPrGraph.getProbabilisticEdges().size()+" LOG_EDGES: "+subPrGraph.getLogicalEdges().size());
+				LOG.info("REDUCING PrEdges // |N|="+n.getEntities().size()+
+				        " PR_EDGES: "+subPrGraph.getProbabilisticEdges().size()+
+				        " LOG_EDGES: "+subPrGraph.getLogicalEdges().size());
 				initialProbability *= 
 						reduceClique(subPrGraph, additionalLogicalAxioms, 
 								reasoner, unsatisfiableAxioms, 0);
@@ -474,9 +478,9 @@ public class ProbabilisticGraphCalculator {
 				subPrGraph.calculateEdgeProbabilityMatrix(getOWLDataFactory());
 				nReduced++;
 			}
-			cliqSoln.messages.add("Used heuristic to estimate some probabilistic edges - confidence may be negative. |Reduced| = "+nReduced);
+			cliqSoln.messages.add("Used heuristic to estimate "+nReduced+" probabilistic edges - confidence may be negative. |Reduced| = "+nReduced);
 			for (OWLAxiom ax : unsatisfiableAxioms) {
-				cliqSoln.messages.add("ELIMINATED: " + render(ax)); 
+				cliqSoln.messages.add("ELIMINATED_UNSATISFIABLE: " + render(ax)); 
 			}
 			reasoner.dispose();
 			// TODO: determine if we can split clique
@@ -495,9 +499,9 @@ public class ProbabilisticGraphCalculator {
 		OWLReasoner reasoner = reasonerFactory.createReasoner(candidateOntology);
 
 		int N = prEdges.size();
-		LOG.info("N="+N);
+		LOG.info("N_EDGES="+N);
 		EdgeType[] etypes = EdgeType.values();
-		int M = etypes.length;
+		int M = etypes.length;  // currently M=4
 		//LOG.info("M="+M);
 		int NUM_STATES = (int) Math.pow(M, N);
 
@@ -784,6 +788,17 @@ public class ProbabilisticGraphCalculator {
 	}
 
 	/**
+	 * A subset of probabilistic edges may be entailed;
+	 * 
+	 * for example, an OMIM to DOID association may have a 0.75 probability of
+	 * being a SubClassOf
+	 * 
+	 * At the same time, the OMIM class may be entailed to be a SubClassOf,
+	 * based on axioms added by a curator (in this case, for MonDO, the axioms
+	 * may come from the omimclusters ontology).
+	 * 
+	 * This method will find entailed edges - these can then be used by the calling
+	 * code to alter the probabilistic graph
 	 * 
 	 * @param pg
 	 * @param reasoner

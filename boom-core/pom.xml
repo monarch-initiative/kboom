@@ -16,7 +16,7 @@
 
 	<build>
 		<plugins>
-			<!-- Build a bin/owlbag.jar file with all dependencies -->
+			<!-- Build a bin/kboom.jar file with all dependencies -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>

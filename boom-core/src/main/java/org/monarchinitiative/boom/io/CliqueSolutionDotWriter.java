@@ -101,7 +101,7 @@ public class CliqueSolutionDotWriter {
 		return cs.axioms.stream().map( (OWLAxiom a) -> renderEdge(a, "blue")).collect(Collectors.joining("\n"));
 	}
 	private String renderGivenLogicalEdges() {
-		// note that the greedy optimization procedure will have switched som
+		// note that the greedy optimization procedure will have switched some
 		// probabilistic edges to logical edges in advance; these will not have an entry in
 		// the axiom probability index. TODO: improve datamodel so this is not necessary
 		return cs.subGraph.getLogicalEdges().stream().
