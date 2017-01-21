@@ -37,7 +37,39 @@ public class ProbabilisticGraphCalculatorTest {
 
     OWLLoader loader = new OWLLoader();
     OWLOntology ontology;
+    
+    class ExpectedAxiom {
+        OWLAxiom axiom;
+        boolean isExpected = true;
+        public ExpectedAxiom(OWLAxiom axiom) {
+            super();
+            this.axiom = axiom;
+        }
+        
+        
+    }
 
+    @Test
+    public void testDisjoint() throws OWLOntologyCreationException, OBOFormatParserException, IOException, OWLOntologyStorageException {
+        // cliques should not have subclasses of two disjointclasses 
+        
+        Set<CliqueSolution> solns = 
+                runUsingResources("disjoint_test.obo",
+                        "ptable-disjoint.tsv", 
+                        "disjoint-resolved.owl",
+
+                        notEquiv("Y_1c", "X_2c"), // P=0.8; but this would violate Disjoint(X_1 X_2)
+                        equiv("Y_1c", "X_1c"),
+                        equiv("Y_1cA", "X_1cA"),
+                        equiv("Y_2c", "X_2c"),
+                                                                      
+                        notSubclass("Y_1", "X_1"),
+                        equiv("Y_1", "X_1"),
+                        equiv("Y_root", "X_root")
+ 
+        );
+    }
+    
     @Test
     public void testBasic() throws OWLOntologyCreationException, OBOFormatParserException, IOException, OWLOntologyStorageException {
         // fake ontology. fake OMIM IDs in flat hierarchy.
@@ -220,16 +252,13 @@ public class ProbabilisticGraphCalculatorTest {
 
     @Test
     public void testAssertedSubClass() throws OWLOntologyCreationException, OBOFormatParserException, IOException, OWLOntologyStorageException {
-        // Pr(X1b<Xroot) = 0.01
-        // however, this is also specified as a logical axiom
 
         Set<CliqueSolution> solns = 
-                runUsingResources("basic.obo", "ptable-asserted-subclass.tsv", "asserted-subclass-resolved.owl"
+                runUsingResources("x-ontology-subclass.obo", "ptable-asserted-subclass.tsv", "asserted-subclass-resolved.owl"
                         );
         assertEquals(1, solns.size());
-        CliqueSolution s = solns.iterator().next();
-        assertEquals("this clique has a single solution, which is to accept the proposed axiom",
-                1, s.axioms.size());
+        long nSolved = solns.stream().filter(s -> s.solved).count();
+        assertEquals(0, nSolved);
     }
 
     @Test
@@ -297,18 +326,34 @@ public class ProbabilisticGraphCalculatorTest {
 
 
 
-    public OWLAxiom equiv(String c1, String c2) {
-        return df().getOWLEquivalentClassesAxiom(
+    public ExpectedAxiom equiv(String c1, String c2) {
+        return new ExpectedAxiom(df().getOWLEquivalentClassesAxiom(
                 df().getOWLClass(getIRI(c1)),
-                df().getOWLClass(getIRI(c2)));
+                df().getOWLClass(getIRI(c2))));
 
     }
-    public OWLAxiom subclass(String c1, String c2) {
-        return df().getOWLSubClassOfAxiom(
+    
+    public ExpectedAxiom subclass(String c1, String c2) {
+        return new ExpectedAxiom(df().getOWLSubClassOfAxiom(
                 df().getOWLClass(getIRI(c1)),
-                df().getOWLClass(getIRI(c2)));
+                df().getOWLClass(getIRI(c2))));
 
     }
+
+    public ExpectedAxiom notSubclass(String c1, String c2) {
+        ExpectedAxiom ea = subclass(c1, c2);
+        ea.isExpected = false;
+        return ea;
+
+    }
+    
+    public ExpectedAxiom notEquiv(String c1, String c2) {
+        ExpectedAxiom ea = equiv(c1, c2);
+        ea.isExpected = false;
+        return ea;
+
+    }
+
 
     public boolean solutionsContainAxiom(Set<CliqueSolution> cliques, OWLAxiom ea) {
 
@@ -323,15 +368,23 @@ public class ProbabilisticGraphCalculatorTest {
 
 
     public Set<CliqueSolution> runUsingResources(String ontFile, String ptableFile, String outpath,
-            OWLAxiom... expectedAxioms) throws OWLOntologyCreationException, OBOFormatParserException, IOException, OWLOntologyStorageException {
+            ExpectedAxiom... expectedAxioms) throws OWLOntologyCreationException, OBOFormatParserException, IOException, OWLOntologyStorageException {
         Set<CliqueSolution> cliques =
                 runUsingPaths(Resources.getResource(ontFile).getFile(),
                         getResource(ptableFile).getAbsolutePath(),
                         "target/" + outpath
                         );
-        for (OWLAxiom a : expectedAxioms)  {
-            assertTrue("does not contain: "+a,
-                    solutionsContainAxiom(cliques,a));
+        for (ExpectedAxiom ea : expectedAxioms)  {
+            OWLAxiom a = ea.axiom;
+            if (ea.isExpected) {
+                assertTrue("does not contain: "+a,
+                        solutionsContainAxiom(cliques,a));
+            }
+            else {
+                assertTrue("unexpectedly contains: "+a,
+                        !solutionsContainAxiom(cliques,a));
+                
+            }
         }
 
         return cliques;
