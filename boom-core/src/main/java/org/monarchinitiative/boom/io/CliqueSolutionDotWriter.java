@@ -227,7 +227,7 @@ public class CliqueSolutionDotWriter {
 
 
     private String getId(OWLClass c) {
-        return c.getIRI().getFragment();
+        return c.getIRI().getFragment().replace(".", "_").replace("-", "_");
     }
 
     private String getId(String c) {
