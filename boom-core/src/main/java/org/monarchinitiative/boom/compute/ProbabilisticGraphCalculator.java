@@ -239,8 +239,10 @@ public class ProbabilisticGraphCalculator {
      */
     public void propagateDownDisjointnessAxioms() {
 
+        LOG.info("Propagating down disjointness axioms...");
         OWLReasoner reasoner = getReasonerFactory().createReasoner(sourceOntology);
-
+        LOG.info("Created reasoner...");
+        
         Set<OWLDisjointClassesAxiom> newAxioms = new HashSet<>();
         for (OWLDisjointClassesAxiom a : sourceOntology.getAxioms(AxiomType.DISJOINT_CLASSES)) {
             Set<OWLClass> cs = a.getClassExpressions().stream().
@@ -261,7 +263,7 @@ public class ProbabilisticGraphCalculator {
                             for (OWLClass dsub : dsubs) {
                                 OWLDisjointClassesAxiom ax = getOWLDataFactory().getOWLDisjointClassesAxiom(csub, dsub);
 
-                                LOG.info("PROPAGATED: "+ax);
+                                //LOG.info("PROPAGATED: "+ax);
                                 newAxioms.add(ax);
                             }
                         }
@@ -518,9 +520,14 @@ public class ProbabilisticGraphCalculator {
 
         Double initialProbability = 1.0;
 
+        // ---
         // reduce combinatorial possibilities using greedy algorithm to turn
         // pr edges into logical edges
+        // ---
+        
+        // logical axioms created as result of procedure
         Set<OWLAxiom> additionalLogicalAxioms = new HashSet<OWLAxiom>();
+        
         if (cliqSoln.initialNumberOfProbabilisticEdges > maxProbabilisticEdges) {
 
             OWLOntology coreOntology = mgr.createOntology(subPrGraph.getLogicalEdges());
@@ -703,7 +710,7 @@ public class ProbabilisticGraphCalculator {
                                 // c and d are in the same ontology, and
                                 // c is inferred to be a subclass of d in this configuration
                                 // and this was not previously asserted
-                                LOG.info("  ENTAILED: "+c+" SubClassOf "+d);
+                                //LOG.info("  ENTAILED: "+c+" SubClassOf "+d);
                                 // TODO - configure penalty by ontology;
                                 // e.g. DOID may be expected to have missing links
                                 jointProbability *= 0.9;                            
@@ -721,7 +728,7 @@ public class ProbabilisticGraphCalculator {
 
                     }
                     if (!reasoner.isSatisfiable(c)) {
-                        LOG.info("UNSAT:"+c+" in state: "+s);
+                        //LOG.info("UNSAT:"+c+" in state: "+s);
                         isZeroProbability = true;
                         jointProbability = 0;
                         numUnsats++;
@@ -1140,9 +1147,9 @@ public class ProbabilisticGraphCalculator {
      * is chosen
      * 
      * @param sg
-     * @param addedLogicalAxioms
+     * @param addedLogicalAxioms - accumulates all logical axioms added
      * @param reasoner 
-     * @param unsatisfiableAxioms 
+     * @param unsatisfiableAxioms - accumulates all unsatisfiable axioms
      * @return Pr[reducedState]
      */
     public Double reduceClique(ProbabilisticGraph sg, Set<OWLAxiom> addedLogicalAxioms, OWLReasoner reasoner, 
@@ -1189,9 +1196,12 @@ public class ProbabilisticGraphCalculator {
 
         }
         else {
+            
+            // add most likely candidate axiom to ontology
             OWLOntology ont = reasoner.getRootOntology();
             ont.getOWLOntologyManager().addAxiom(ont, bestAxiom);
             reasoner.flush();
+            
             boolean isValid = testForValidity(bestAxiom, ont.getClassesInSignature(), reasoner);
             if (isValid) {
                 for (OWLAxiom ax : addedLogicalAxioms) {
@@ -1217,9 +1227,10 @@ public class ProbabilisticGraphCalculator {
         }
         ProbabilisticEdge e = sg.getProbabilisticEdges().get(maxi);
         newEdges.add(e);
-        LOG.info("Translating Probabilistic Edge: " + e + " ==> LOGICAL EDGE: "+render(bestAxiom));
+        LOG.info("Translating Probabilistic Edge: " + e + " ==> LOGICAL EDGE: "+render(bestAxiom)+" p="+maxp);
         if (bestAxiom != null) {
             sg.getLogicalEdges().add(bestAxiom); // translate the probabilistic edge to a logical edge
+            sg.getProbabilisticEdgeReplacementMap().put(bestAxiom, e);
             Set<ProbabilisticEdge> rmEdges = findEntailedProbabilisticEdges(sg, reasoner);
             rmEdges.remove(e); // will already be removed
             if (rmEdges.size() >0) {
@@ -1230,6 +1241,9 @@ public class ProbabilisticGraphCalculator {
                     sg.getProbabilisticEdges().removeAll(rmEdges);
                 }
             }
+        }
+        else {
+            sg.getEliminatedEdges().add(e);
         }
         sg.getProbabilisticEdges().remove(e);
         return pr;

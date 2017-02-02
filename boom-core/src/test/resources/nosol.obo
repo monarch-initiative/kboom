@@ -1,0 +1,109 @@
+ontology: nosol
+
+[Term]
+id: X:1
+disjoint_from: Y:1
+
+[Term]
+id: X:2
+is_a: X:1
+
+[Term]
+id: X:3
+is_a: X:2
+
+[Term]
+id: X:4
+is_a: X:3
+
+
+[Term]
+id: X:5
+is_a: X:4
+
+[Term]
+id: X:6
+is_a: X:5
+
+[Term]
+id: X:7
+is_a: X:6
+
+[Term]
+id: X:8
+is_a: X:7
+
+[Term]
+id: X:9
+is_a: X:8
+
+[Term]
+id: Y:1
+
+[Term]
+id: Y:2
+is_a: Y:1
+
+[Term]
+id: Y:3
+is_a: Y:2
+
+[Term]
+id: Y:4
+is_a: Y:3
+
+[Term]
+id: Y:5
+is_a: Y:4
+
+[Term]
+id: Y:6
+is_a: Y:5
+
+[Term]
+id: Y:7
+is_a: Y:6
+
+[Term]
+id: Y:8
+is_a: Y:7
+
+[Term]
+id: Y:9
+is_a: Y:8
+
+
+[Term]
+id: Z:1
+
+[Term]
+id: Z:2
+is_a: Z:1
+
+[Term]
+id: Z:3
+is_a: Z:2
+
+[Term]
+id: Z:4
+is_a: Z:3
+
+[Term]
+id: Z:5
+is_a: Z:4
+
+[Term]
+id: Z:6
+is_a: Z:5
+
+[Term]
+id: Z:7
+is_a: Z:6
+
+[Term]
+id: Z:8
+is_a: Z:7
+
+[Term]
+id: Z:9
+is_a: Z:8

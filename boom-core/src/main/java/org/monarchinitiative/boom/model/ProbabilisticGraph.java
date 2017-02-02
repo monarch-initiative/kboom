@@ -34,7 +34,8 @@ public class ProbabilisticGraph {
 	private OWLAxiom[][] axiomIndex;
 	private double[][] probabilityIndex;
 	private Map<OWLAxiom, Double> axiomPriorProbabilityMap = new HashMap<>();
-
+	private Map<OWLAxiom, ProbabilisticEdge> probabilisticEdgeReplacementMap = new HashMap<>();
+	private Set<ProbabilisticEdge> eliminatedEdges = new HashSet<>();
 
 	/**
 	 * Note the edge lists is mutable; if it changes, axiomIndex must be recalculated
@@ -114,6 +115,42 @@ public class ProbabilisticGraph {
 	
 	
 	/**
+	 * As a heuristic, some candidate edges may be trimmed and replaced by a logical axiom
+	 * 
+     * @return the probabilisticEdgeReplacementMap
+     */
+    public Map<OWLAxiom, ProbabilisticEdge> getProbabilisticEdgeReplacementMap() {
+        return probabilisticEdgeReplacementMap;
+    }
+
+
+    /**
+     * @param probabilisticEdgeReplacementMap the probabilisticEdgeReplacementMap to set
+     */
+    public void setProbabilisticEdgeReplacementMap(
+            Map<OWLAxiom, ProbabilisticEdge> probabilisticEdgeReplacementMap) {
+        this.probabilisticEdgeReplacementMap = probabilisticEdgeReplacementMap;
+    }
+
+    
+
+    /**
+     * @return the eliminatedEdges
+     */
+    public Set<ProbabilisticEdge> getEliminatedEdges() {
+        return eliminatedEdges;
+    }
+
+
+    /**
+     * @param eliminatedEdges the eliminatedEdges to set
+     */
+    public void setEliminatedEdges(Set<ProbabilisticEdge> eliminatedEdges) {
+        this.eliminatedEdges = eliminatedEdges;
+    }
+
+
+    /**
 	 * @param axiomPriorProbabilityMap the axiomPriorProbabilityMap to set
 	 */
 	public void setAxiomPriorProbabilityMap(

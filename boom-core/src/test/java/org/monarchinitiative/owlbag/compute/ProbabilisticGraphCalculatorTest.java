@@ -207,6 +207,21 @@ public class ProbabilisticGraphCalculatorTest {
         CliqueSolution s = solns.iterator().next();
         assertTrue("this clique has no solution", !s.solved);
     }
+    
+    @Test
+    public void testNoSolutionsDueToGreedy() throws OWLOntologyCreationException, OBOFormatParserException, IOException, OWLOntologyStorageException {
+        // Pr(X1<Y1) = 0.9 [row 1]
+        // Pr(X1<Y1) = 0.05 [row 2]
+
+        Set<CliqueSolution> solns = 
+                runUsingResources("nosol.obo", "ptable-nosol.tsv", "nosol-resolved.owl"
+                        );
+        assertEquals(1, solns.size());
+        CliqueSolution s = solns.iterator().next();
+        assertTrue("this clique has no solution", !s.solved);
+    }
+    
+    
 
     @Test
     public void testOneSolution() throws OWLOntologyCreationException, OBOFormatParserException, IOException, OWLOntologyStorageException {
