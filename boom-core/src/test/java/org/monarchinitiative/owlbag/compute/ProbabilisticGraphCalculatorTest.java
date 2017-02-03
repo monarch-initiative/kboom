@@ -49,26 +49,7 @@ public class ProbabilisticGraphCalculatorTest {
         
     }
 
-    @Test
-    public void testDisjoint() throws OWLOntologyCreationException, OBOFormatParserException, IOException, OWLOntologyStorageException {
-        // cliques should not have subclasses of two disjointclasses 
-        
-        Set<CliqueSolution> solns = 
-                runUsingResources("disjoint_test.obo",
-                        "ptable-disjoint.tsv", 
-                        "disjoint-resolved.owl",
-
-                        notEquiv("Y_1c", "X_2c"), // P=0.8; but this would violate Disjoint(X_1 X_2)
-                        equiv("Y_1c", "X_1c"),
-                        equiv("Y_1cA", "X_1cA"),
-                        equiv("Y_2c", "X_2c"),
-                                                                      
-                        notSubclass("Y_1", "X_1"),
-                        equiv("Y_1", "X_1"),
-                        equiv("Y_root", "X_root")
  
-        );
-    }
     
     @Test
     public void testBasic() throws OWLOntologyCreationException, OBOFormatParserException, IOException, OWLOntologyStorageException {
@@ -105,6 +86,27 @@ public class ProbabilisticGraphCalculatorTest {
                 equiv("X_3", "Z_3")
 
                 );
+    }
+    
+    @Test
+    public void testDisjoint() throws OWLOntologyCreationException, OBOFormatParserException, IOException, OWLOntologyStorageException {
+        // cliques should not have subclasses of two disjointclasses 
+        
+        Set<CliqueSolution> solns = 
+                runUsingResources("disjoint_test.obo",
+                        "ptable-disjoint.tsv", 
+                        "disjoint-resolved.owl",
+
+                        notEquiv("Y_1c", "X_2c"), // P=0.8; but this would violate Disjoint(X_1 X_2)
+                        equiv("Y_1c", "X_1c"),
+                        equiv("Y_1cA", "X_1cA"),
+                        equiv("Y_2c", "X_2c"),
+                                                                      
+                        notSubclass("Y_1", "X_1"),
+                        equiv("Y_1", "X_1"),
+                        equiv("Y_root", "X_root")
+ 
+        );
     }
 
     @Test

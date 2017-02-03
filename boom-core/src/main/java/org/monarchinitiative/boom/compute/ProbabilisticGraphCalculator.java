@@ -16,7 +16,6 @@ import org.monarchinitiative.boom.model.EdgeType;
 import org.monarchinitiative.boom.model.ProbabilisticEdge;
 import org.monarchinitiative.boom.model.ProbabilisticGraph;
 import org.semanticweb.elk.owlapi.ElkReasonerFactory;
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLObjectRenderer;
 import org.semanticweb.owlapi.manchestersyntax.renderer.ManchesterOWLSyntaxOWLObjectRendererImpl;
 import org.semanticweb.owlapi.model.AddImport;
@@ -37,7 +36,6 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.model.parameters.Imports;
 import org.semanticweb.owlapi.reasoner.Node;
-import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 
@@ -65,6 +63,7 @@ public class ProbabilisticGraphCalculator {
     OWLReasonerFactory reasonerFactory = new ElkReasonerFactory();
     OWLObjectRenderer renderer;
     Set<OWLClass> filterOnClasses;
+    Set<OWLClass> filterOnRootClasses;
     public boolean isExperimental = false; // TEMPORARY
 
 
@@ -204,6 +203,15 @@ public class ProbabilisticGraphCalculator {
     }
 
 
+
+    /**
+     * @param filterOnRootClasses the filterOnRootClasses to set
+     */
+    public void setFilterOnRootClasses(Set<OWLClass> filterOnRootClasses) {
+        this.filterOnRootClasses = filterOnRootClasses;
+    }
+
+
     /**
      * @return the graph
      */
@@ -242,7 +250,7 @@ public class ProbabilisticGraphCalculator {
         LOG.info("Propagating down disjointness axioms...");
         OWLReasoner reasoner = getReasonerFactory().createReasoner(sourceOntology);
         LOG.info("Created reasoner...");
-        
+
         Set<OWLDisjointClassesAxiom> newAxioms = new HashSet<>();
         for (OWLDisjointClassesAxiom a : sourceOntology.getAxioms(AxiomType.DISJOINT_CLASSES)) {
             Set<OWLClass> cs = a.getClassExpressions().stream().
@@ -273,11 +281,12 @@ public class ProbabilisticGraphCalculator {
                 }                
             }
         }
-        LOG.info("Propagated disjointness axioms: "+newAxioms.size());
-        getOWLOntologyManager().addAxioms(sourceOntology, newAxioms);
-
         reasoner.dispose();
+        LOG.info("ADDING Propagated disjointness axioms: "+newAxioms.size());
+        getOWLOntologyManager().addAxioms(sourceOntology, newAxioms);
+        LOG.info("ADDED Propagated disjointness axioms: "+newAxioms.size());
 
+ 
     }
 
     /**
@@ -340,9 +349,17 @@ public class ProbabilisticGraphCalculator {
         for (OWLClass c : sourceOntology.getClassesInSignature()) {
             Node<OWLClass> n = reasoner.getEquivalentClasses(c);
             int size = n.getSize();
+            if (filterOnRootClasses != null && filterOnRootClasses.size() > 0) {
+                if (!reasoner.getSuperClasses(c, false).getFlattened().containsAll(filterOnRootClasses)) {
+                    LOG.info("SKIPPING: "+c+" as not in set");
+                    continue;
+                }
+                LOG.info("INCLUDING: "+c);
+            }
             if (size > 1) {
                 cliques.add(n);
             }
+
         }
 
         LOG.info("|Cliques| = "+cliques.size()+" (first pass)");
@@ -443,6 +460,7 @@ public class ProbabilisticGraphCalculator {
         Set<OWLAxiom> axioms = new HashSet<OWLAxiom>();
         Set<CliqueSolution> rpts = new HashSet<CliqueSolution>();
         int ctr = 0;
+        LOG.info("Solving cliques...");
         for (Node<OWLClass> n : cliques) {
 
             // user option: only process nodes with desired classes
@@ -524,10 +542,10 @@ public class ProbabilisticGraphCalculator {
         // reduce combinatorial possibilities using greedy algorithm to turn
         // pr edges into logical edges
         // ---
-        
+
         // logical axioms created as result of procedure
         Set<OWLAxiom> additionalLogicalAxioms = new HashSet<OWLAxiom>();
-        
+
         if (cliqSoln.initialNumberOfProbabilisticEdges > maxProbabilisticEdges) {
 
             OWLOntology coreOntology = mgr.createOntology(subPrGraph.getLogicalEdges());
@@ -582,7 +600,7 @@ public class ProbabilisticGraphCalculator {
         Set<OWLDisjointClassesAxiom> disjointAxioms = 
                 logicalOntology.getAxioms(AxiomType.DISJOINT_CLASSES);
         if (disjointAxioms.size() > 0) {
-            LOG.info("Disjointness Axioms in module: "+disjointAxioms);
+            LOG.info("Disjointness Axioms in module: "+disjointAxioms.size());
         }
 
         int N = prEdges.size();
@@ -1092,12 +1110,16 @@ public class ProbabilisticGraphCalculator {
             }       
         }
         for (OWLDisjointClassesAxiom ax : sourceOntology.getAxioms(AxiomType.DISJOINT_CLASSES)) {
+            int numOverlap = 0;
             for ( OWLClassExpression x : ax.getClassExpressions() ) {
                 if (clzs.contains(x)) {
-                    axioms.add(ax);
-                    LOG.info(" ADDING: "+ax);
-                    break;
+                    numOverlap++;
                 }
+            }
+            if (numOverlap >= 2) {
+                axioms.add(ax);
+                LOG.info(" ADDING: "+ax);
+                break;                
             }
         }
         for (OWLEquivalentClassesAxiom ax : sourceOntology.getAxioms(AxiomType.EQUIVALENT_CLASSES)) {
@@ -1196,12 +1218,12 @@ public class ProbabilisticGraphCalculator {
 
         }
         else {
-            
+
             // add most likely candidate axiom to ontology
             OWLOntology ont = reasoner.getRootOntology();
             ont.getOWLOntologyManager().addAxiom(ont, bestAxiom);
             reasoner.flush();
-            
+
             boolean isValid = testForValidity(bestAxiom, ont.getClassesInSignature(), reasoner);
             if (isValid) {
                 for (OWLAxiom ax : addedLogicalAxioms) {
