@@ -301,6 +301,7 @@ public class ProbabilisticGraphCalculator {
      */
     public Set<Node<OWLClass>> findCliques() throws OWLOntologyCreationException {
 
+        LOG.info("Finding cliques...");
         OWLOntology dynamicOntology;
 
         dynamicOntology = getOWLOntologyManager().createOntology();
@@ -317,6 +318,7 @@ public class ProbabilisticGraphCalculator {
             getOWLOntologyManager().addAxiom(coreOntology, a);
         }
         addImport(coreOntology, dynamicOntology);
+        LOG.info("Creating reasoner...");
         OWLReasoner reasoner = getReasonerFactory().createReasoner(dynamicOntology);
 
         // first find any pr edges that are overridden by logical axiom entailments.
@@ -324,6 +326,7 @@ public class ProbabilisticGraphCalculator {
         // asserted logical axioms across ontologies.
         // For the MonDO pipeline, this includes the OMIM clusters that are
         // later made equivalent with DO
+        LOG.info("Finding weighted edges that are inferred (p=1)...");
         Set<ProbabilisticEdge> rmEdges = findEntailedProbabilisticEdges(probabilisticGraph, reasoner);
         if (rmEdges.size() > 0) {
             for (ProbabilisticEdge e : rmEdges) {
@@ -337,6 +340,7 @@ public class ProbabilisticGraphCalculator {
             }
         }
 
+        LOG.info("Using weighted edges to find cliques...");
         // assume every probabilistic edge is an equivalence axiom
         for (ProbabilisticEdge e : probabilisticGraph.getProbabilisticEdges()) {
             if (e.getProbabilityTable().getTypeProbabilityMap().get(EdgeType.NONE) < 1.0) {
@@ -345,8 +349,13 @@ public class ProbabilisticGraphCalculator {
             }
         }
         reasoner.flush();
+
+        LOG.info("Finding equivalence nodes...");
         Set<Node<OWLClass>> cliques = new HashSet<>();
+        int maxSize = 0;
+        int i=0;
         for (OWLClass c : sourceOntology.getClassesInSignature()) {
+            i++;
             Node<OWLClass> n = reasoner.getEquivalentClasses(c);
             int size = n.getSize();
             if (filterOnRootClasses != null && filterOnRootClasses.size() > 0) {
@@ -355,6 +364,10 @@ public class ProbabilisticGraphCalculator {
                     continue;
                 }
                 LOG.info("INCLUDING: "+c);
+            }
+            if (size > maxSize) {
+                maxSize = size;
+                LOG.info("CURRENT MAX SIZE: "+maxSize+" // "+n+" :: processed " + i +"/" + sourceOntology.getClassesInSignature().size());
             }
             if (size > 1) {
                 cliques.add(n);
