@@ -7,8 +7,9 @@ branches:
   only:
   - master
 
-#before_install:
-#  - cd owlsim-core; make
+before_install:
+  - "sudo apt-get install graphviz"
+  - "which dot"
 
 after_success:
   - mvn clean cobertura:cobertura coveralls:report
