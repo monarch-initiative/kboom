@@ -8,9 +8,15 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
+import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 /**
  * A probabilistic graph/ontology consists of logical axioms and probabilistic axioms.
@@ -282,6 +288,22 @@ public class ProbabilisticGraph {
 	
 	private double avg(double x, double y) {
 		return (x+y)/2;
+	}
+	
+	public OWLOntology createSubOntology(OWLOntologyManager mgr, IRI ontologyIRI, OWLOntology parentOnt) throws OWLOntologyCreationException {
+	    OWLOntology ont = mgr.createOntology(ontologyIRI);
+	    mgr.addAxioms(ont, getLogicalEdges());
+	    mgr.addAxioms(ont, probabilisticEdgeReplacementMap.keySet());
+	    for (OWLClass c: ont.getClassesInSignature()) {
+	        Set<OWLAnnotationAssertionAxiom> aaas = parentOnt.getAnnotationAssertionAxioms(c.getIRI());
+	        mgr.addAxioms(ont, aaas);
+	    }
+	    OWLAnnotationProperty xprop = mgr.getOWLDataFactory().getOWLAnnotationProperty(IRI.create("http://www.geneontology.org/formats/oboInOwl#hasDbXref"));
+	    for (ProbabilisticEdge e : getProbabilisticEdges()) {
+	        OWLAxiom ax = mgr.getOWLDataFactory().getOWLAnnotationAssertionAxiom(xprop, e.getSourceClass().getIRI(), e.getTargetClass().getIRI());
+	        mgr.addAxiom(ont, ax);
+	    }
+	    return ont;
 	}
 
 }

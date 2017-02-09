@@ -286,7 +286,7 @@ public class ProbabilisticGraphCalculator {
         getOWLOntologyManager().addAxioms(sourceOntology, newAxioms);
         LOG.info("ADDED Propagated disjointness axioms: "+newAxioms.size());
 
- 
+
     }
 
     /**
@@ -486,11 +486,15 @@ public class ProbabilisticGraphCalculator {
 
             ctr++;
             LOG.info("NUM:"+ctr+"/"+cliques.size());
+
+            // SOLVE CLIQUE
             long t1 = System.currentTimeMillis();
             CliqueSolution rpt = solveClique(n);
             long t2 = System.currentTimeMillis();
-            rpt.timeToSolve = t2-t1;
+            
+            // add solution report
             if (rpt != null) {
+                rpt.timeToSolve = t2-t1;
                 rpts.add(rpt);
                 if (rpt.axioms != null) {
                     axioms.addAll(rpt.axioms);
@@ -1072,10 +1076,20 @@ public class ProbabilisticGraphCalculator {
     }
 
     /**
-     * Extract a probabilistic graph sub-module
+     * Extract a probabilistic graph sub-module, given a node (equivalence set)
      * 
-     * @param seed node
-     * @return probabilistic graph
+     * This consists of:
+     * 
+     *  - A: SubClassOf, EquivalentClasses and DisjointClasses, extracted as per modularization strategy
+     *  - H: probabilistic edges that connect any two classes in the module
+     *  
+     *  Currently only one modularization strategy is implemented: all classes in signature of axiom
+     *  must be in the seed node
+     *  
+     *  (TODO: experiment with SLME methods)
+     * 
+     * @param n - seed node
+     * @return probabilistic graph - collection of logical and weighted candidate axioms
      * @throws OWLOntologyCreationException 
      */
     public ProbabilisticGraph getProbabilisticGraphModule(Node<OWLClass> n) throws OWLOntologyCreationException {
