@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.monarchinitiative.boom.compute.IncoherentProbabilisticOntologyException;
 import org.monarchinitiative.boom.compute.ProbabilisticGraphCalculator;
 import org.monarchinitiative.boom.io.CliqueSolutionDotWriter;
 import org.monarchinitiative.boom.io.LabelProvider;
@@ -43,12 +44,12 @@ public class MarkdownRunner {
 
 
 
-	public Set<CliqueSolution> runAll() throws OWLOntologyCreationException, IOException {
+	public Set<CliqueSolution> runAll() throws OWLOntologyCreationException, IOException, IncoherentProbabilisticOntologyException {
 		ProbabilisticGraphCalculator pgp = new ProbabilisticGraphCalculator(ontology);
 		return runAll(pgp);
 	}
 	
-	public Set<CliqueSolution> runAll(ProbabilisticGraphCalculator pgp) throws OWLOntologyCreationException, IOException {
+	public Set<CliqueSolution> runAll(ProbabilisticGraphCalculator pgp) throws OWLOntologyCreationException, IOException, IncoherentProbabilisticOntologyException {
 		
 		pgp.setProbabilisticGraph(pg);
 		Set<CliqueSolution> rpts = pgp.solveAllCliques();

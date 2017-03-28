@@ -36,6 +36,8 @@ public class CliqueSolution {
 	public Set<Node<OWLClass>> nodes = new HashSet<>();
 	
 	@Expose public Set<String> axiomStrings;
+	@Expose public int numberOfStates;
+	@Expose public int numberOfValidStates;
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()

@@ -35,7 +35,9 @@ public class ProbabilisticGraph {
 
 
 	List<ProbabilisticEdge> probabilisticEdges = new ArrayList<ProbabilisticEdge>();
-	Set<OWLAxiom> logicalEdges =  new HashSet<OWLAxiom>();
+    Set<OWLAxiom> logicalEdges =  new HashSet<OWLAxiom>();
+    Set<OWLAxiom> negatedLogicalEdges =  new HashSet<OWLAxiom>();
+	
 
 	private OWLAxiom[][] axiomIndex;
 	private double[][] probabilityIndex;
@@ -89,8 +91,34 @@ public class ProbabilisticGraph {
 		this.logicalEdges.addAll(logicalEdges);
 	}
 
+	
 
 	/**
+     * @return the negatedLogicalEdges
+     */
+    public Set<OWLAxiom> getNegatedLogicalEdges() {
+        return negatedLogicalEdges;
+    }
+
+
+    /**
+     * @param negatedLogicalEdges the negatedLogicalEdges to set
+     */
+    public void setNegatedLogicalEdges(Set<OWLAxiom> negatedLogicalEdges) {
+        this.negatedLogicalEdges = negatedLogicalEdges;
+    }
+    
+    /**
+     * @param negatedLogicalEdge to add
+     */
+    public void addNegatedLogicalEdge(OWLAxiom negatedLogicalEdge) {
+        this.negatedLogicalEdges.add(negatedLogicalEdge);
+    }
+
+
+
+
+    /**
 	 * TODO: use immutable lists for edges; this index must be recalculated if edges change
 	 * 
 	 * @return logical axiom index keyed by edge index and type
@@ -231,6 +259,14 @@ public class ProbabilisticGraph {
 		setAxiomPriorProbabilityMap(axiomPriorProbabilityMap);
 	}
 
+	/**
+	 * We expect ptable to have 1 row per pair; if a pair is included twice, as a reciprocal,
+	 * we average values
+	 * 
+	 * TODO - consider throwing error if in strict mode
+	 * 
+	 * @return number collapsed
+	 */
 	public int collapseReciprocals() {
 		LOG.info("PRE-COLLAPSING RECIPROCALS:"+probabilisticEdges.size());
 		List<ProbabilisticEdge> newEdges = new ArrayList<ProbabilisticEdge>();

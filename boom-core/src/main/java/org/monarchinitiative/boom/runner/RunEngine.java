@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.monarchinitiative.boom.compute.IncoherentProbabilisticOntologyException;
 import org.monarchinitiative.boom.compute.ProbabilisticGraphCalculator;
 import org.monarchinitiative.boom.io.IDTools;
 import org.monarchinitiative.boom.io.OWLLoader;
@@ -62,6 +63,9 @@ public class RunEngine {
     @Parameter(names = { "--experimental" }, description = "Experimental")
     private Boolean isExperimental = false;
 
+    @Parameter(names = { "--newSubClassProp" }, description = "probability of a new subclass within an ontology")
+    private Double newSubClassProp = 0.9;
+
     @Parameter(names = {"-h", "--help"}, help = true)
     private boolean help = false;
 
@@ -70,7 +74,7 @@ public class RunEngine {
 
 
 
-    public static void main(String ... args) throws OWLOntologyCreationException, IOException, OWLOntologyStorageException {
+    public static void main(String ... args) throws OWLOntologyCreationException, IOException, OWLOntologyStorageException, IncoherentProbabilisticOntologyException {
         RunEngine main = new RunEngine();
         JCommander jCommander = new JCommander(main, args);
         if (main.help) {
@@ -80,7 +84,7 @@ public class RunEngine {
         main.run();
     }
 
-    public void run() throws OWLOntologyCreationException, IOException, OWLOntologyStorageException {
+    public void run() throws OWLOntologyCreationException, IOException, OWLOntologyStorageException, IncoherentProbabilisticOntologyException {
         Logger.getLogger("org.semanticweb.elk").setLevel(Level.OFF);
 
         //System.out.printf("%s %d %s", groups, verbose, debug);

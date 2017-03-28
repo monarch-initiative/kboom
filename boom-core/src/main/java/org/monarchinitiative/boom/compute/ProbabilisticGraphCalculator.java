@@ -1,6 +1,7 @@
 package org.monarchinitiative.boom.compute;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,6 +13,7 @@ import java.util.stream.Collectors;
 import org.apache.log4j.Logger;
 import org.monarchinitiative.boom.io.LabelProvider;
 import org.monarchinitiative.boom.model.CliqueSolution;
+import org.monarchinitiative.boom.model.EdgeProbabilityTable;
 import org.monarchinitiative.boom.model.EdgeType;
 import org.monarchinitiative.boom.model.ProbabilisticEdge;
 import org.monarchinitiative.boom.model.ProbabilisticGraph;
@@ -64,8 +66,17 @@ public class ProbabilisticGraphCalculator {
     OWLObjectRenderer renderer;
     Set<OWLClass> filterOnClasses;
     Set<OWLClass> filterOnRootClasses;
+    
+    double TRUE_THRESHOLD = 0.9999;
+    
+    @Deprecated
     public boolean isExperimental = false; // TEMPORARY
 
+    public class EliminatedProbabilisticEdges {
+        public Set<ProbabilisticEdge> rmEdges = new HashSet<>();
+        public int nInconsistencies = 0;
+    }
+ 
 
     //OWLReasonerFactory reasonerFactory = new org.semanticweb.HermiT.Reasoner.ReasonerFactory();
 
@@ -78,6 +89,11 @@ public class ProbabilisticGraphCalculator {
      * 
      */
     public int cliqueSplitSize = 6;
+    
+    /**
+     * 
+     */
+    public Double newSubClassProb = 0.9;
 
     /**
      * Number of probabilistic edges below which no attempt will be made to resolve clique
@@ -213,6 +229,14 @@ public class ProbabilisticGraphCalculator {
 
 
     /**
+     * @param newSubClassProb the newSubClassProb to set
+     */
+    public void setNewSubClassProb(Double newSubClassProb) {
+        this.newSubClassProb = newSubClassProb;
+    }
+
+
+    /**
      * @return the graph
      */
     public ProbabilisticGraph getProbabilisticGraph() {
@@ -237,6 +261,69 @@ public class ProbabilisticGraphCalculator {
         AddImport ai = new AddImport(parentOntology, d);
         getOWLOntologyManager().applyChange(ai);
 
+    }
+    
+    /**
+     * Translate all edges with Pr=1.0 to a logical axiom.
+     * 
+     *  - EquivalentClasses replace the weighted edge
+     *  - for SubClassOf (<=), we add the logical axiom, but keep the weighted edge (<)
+     */
+    public void replaceThresholdWeightedEdges() {
+        LOG.info("Replacing all edges with Pr=1.0...");
+        Set<ProbabilisticEdge> rmEdges = new HashSet<>();
+        for (ProbabilisticEdge e : probabilisticGraph.getProbabilisticEdges()) {
+            Map<EdgeType, Double> ptm = e.getProbabilityTable().getTypeProbabilityMap();
+            for (EdgeType et : ptm.keySet()) {
+                OWLClass sc = e.getSourceClass();
+                OWLClass tc = e.getTargetClass();
+                
+                if (ptm.get(et) == 0.0) {
+                    OWLAxiom newNegatedAxiom = null;
+                    if (et.equals(EdgeType.EQUIVALENT_TO)) {
+                        newNegatedAxiom = translateEdgeToEquivalenceAxiom(e);
+                        rmEdges.add(e);
+                    }
+                    else if (et.equals(EdgeType.SUBCLASS_OF)) {
+                        newNegatedAxiom = this.getOWLDataFactory().getOWLSubClassOfAxiom(sc, tc);
+                    }
+                    else if (et.equals(EdgeType.SUPERCLASS_OF)) {
+                        newNegatedAxiom = this.getOWLDataFactory().getOWLSubClassOfAxiom(tc, sc);
+                    }
+                    if (newNegatedAxiom != null)
+                        probabilisticGraph.addNegatedLogicalEdge(newNegatedAxiom);
+                   
+                }
+                
+                if (ptm.get(et) >= TRUE_THRESHOLD) {
+
+                    OWLAxiom newAxiom = null;
+                    if (et.equals(EdgeType.EQUIVALENT_TO)) {
+                        newAxiom = translateEdgeToEquivalenceAxiom(e);
+                        probabilisticGraph.addNegatedLogicalEdge(getOWLDataFactory().getOWLSubClassOfAxiom(tc, sc));
+                        probabilisticGraph.addNegatedLogicalEdge(getOWLDataFactory().getOWLSubClassOfAxiom(sc, tc));
+                        rmEdges.add(e);
+                    }
+                    else if (et.equals(EdgeType.SUBCLASS_OF)) {
+                        newAxiom = this.getOWLDataFactory().getOWLSubClassOfAxiom(sc, tc);
+                        probabilisticGraph.addNegatedLogicalEdge(getOWLDataFactory().getOWLSubClassOfAxiom(tc, sc));
+                                            }
+                    else if (et.equals(EdgeType.SUPERCLASS_OF)) {
+                        newAxiom = this.getOWLDataFactory().getOWLSubClassOfAxiom(tc, sc);
+                        probabilisticGraph.addNegatedLogicalEdge(getOWLDataFactory().getOWLSubClassOfAxiom(sc, tc));
+                    }
+                    LOG.info("SUPPLEMENTING "+e+" ---> "+newAxiom);
+                    if (newAxiom != null) {
+                        getOWLOntologyManager().addAxiom(sourceOntology, newAxiom);
+                    }
+                }
+            }
+        }
+        LOG.info("Removing EQUIV Pr=1.0 edges, count: "+rmEdges.size());
+        LOG.info("Negated logical axioms: "+probabilisticGraph.getNegatedLogicalEdges().size());
+        probabilisticGraph.getProbabilisticEdges().removeAll(rmEdges);
+        
+       
     }
 
     /**
@@ -298,8 +385,9 @@ public class ProbabilisticGraphCalculator {
      * 
      * @return clique nodes
      * @throws OWLOntologyCreationException
+     * @throws IncoherentProbabilisticOntologyException 
      */
-    public Set<Node<OWLClass>> findCliques() throws OWLOntologyCreationException {
+    public Set<Node<OWLClass>> findCliques() throws OWLOntologyCreationException, IncoherentProbabilisticOntologyException {
 
         LOG.info("Finding cliques...");
         OWLOntology dynamicOntology;
@@ -327,19 +415,16 @@ public class ProbabilisticGraphCalculator {
         // For the MonDO pipeline, this includes the OMIM clusters that are
         // later made equivalent with DO
         LOG.info("Finding weighted edges that are inferred (p=1)...");
-        Set<ProbabilisticEdge> rmEdges = findEntailedProbabilisticEdges(probabilisticGraph, reasoner);
-        if (rmEdges.size() > 0) {
-            for (ProbabilisticEdge e : rmEdges) {
+        EliminatedProbabilisticEdges elim = findEntailedProbabilisticEdges(probabilisticGraph, reasoner);
+        if (elim.nInconsistencies > 0) {
+            throw new IncoherentProbabilisticOntologyException(probabilisticGraph);
+        }
+        if (elim.rmEdges.size() > 0) {
+            for (ProbabilisticEdge e : elim.rmEdges) {
                 LOG.info("Pruning edge with logic entailment: "+render(e));
             }
-            if (isExperimental) {
-                probabilisticGraph.getProbabilisticEdges().removeAll(rmEdges);
-            }
-            else {
-                LOG.error("FIX Me!!");
-            }
+            probabilisticGraph.getProbabilisticEdges().removeAll(elim.rmEdges);
         }
-
         LOG.info("Using weighted edges to find cliques...");
         // assume every probabilistic edge is an equivalence axiom
         for (ProbabilisticEdge e : probabilisticGraph.getProbabilisticEdges()) {
@@ -466,8 +551,10 @@ public class ProbabilisticGraphCalculator {
      * @return clique solutions
      * 
      * @throws OWLOntologyCreationException
+     * @throws IncoherentProbabilisticOntologyException 
      */
-    public Set<CliqueSolution> solveAllCliques() throws OWLOntologyCreationException {
+    public Set<CliqueSolution> solveAllCliques() throws OWLOntologyCreationException, IncoherentProbabilisticOntologyException {
+        replaceThresholdWeightedEdges();
         propagateDownDisjointnessAxioms();
         Set<Node<OWLClass>> cliques = findCliques();
         Set<OWLAxiom> axioms = new HashSet<OWLAxiom>();
@@ -588,7 +675,8 @@ public class ProbabilisticGraphCalculator {
                 subPrGraph.calculateEdgeProbabilityMatrix(getOWLDataFactory());
                 nReduced++;
             }
-            cliqSoln.messages.add("Used heuristic to estimate "+nReduced+" probabilistic edges - confidence may be negative. |Reduced| = "+nReduced);
+            cliqSoln.messages.add("Used heuristic to estimate "+nReduced+
+                    " probabilistic edges - confidence may be negative. |Reduced| == "+nReduced);
             for (OWLAxiom ax : unsatisfiableAxioms) {
                 cliqSoln.messages.add("ELIMINATED_UNSATISFIABLE: " + render(ax)); 
             }
@@ -658,6 +746,7 @@ public class ProbabilisticGraphCalculator {
         int numMissingEquivClass = 0;
         int numReasonerCalls = 0;
 
+        long t1 = System.currentTimeMillis();
         for (int s=0; s<NUM_STATES; s++) {
             // each combination can be represented as an N digit number in base M
             char[] states = Strings.padStart(Integer.toString(s, M), N, '0').toCharArray();
@@ -748,7 +837,7 @@ public class ProbabilisticGraphCalculator {
                                 //LOG.info("  ENTAILED: "+c+" SubClassOf "+d);
                                 // TODO - configure penalty by ontology;
                                 // e.g. DOID may be expected to have missing links
-                                jointProbability *= 0.9;                            
+                                jointProbability *= newSubClassProb;                            
                             }
                         }						
                     }
@@ -854,7 +943,12 @@ public class ProbabilisticGraphCalculator {
             }
             numValidCombos++;
         }
+        long t2 = System.currentTimeMillis();
+        
 
+        cliqSoln.numberOfStates = NUM_STATES;
+        cliqSoln.numberOfValidStates = numValidCombos;
+        
         LOG.info("NUM VALID COMBOS:"+numValidCombos+" / "+NUM_STATES);
         if (numValidCombos == 0) {
             LOG.error("UNSOLVABLE");
@@ -913,6 +1007,9 @@ public class ProbabilisticGraphCalculator {
                     continue;
                 if (isInSameOntology(c, d)) {
 
+                    // we do not disallow the entailed graph to have novel
+                    // subClassOf links within an ontology, but this is a useful
+                    // thing to report
                     if (reasoner.getSuperClasses(c, false).containsEntity(d)) {
                         if (!assertedSuperClassesMap.get(c).contains(d)) {
                             cliqSoln.messages.add("ENTAILED: "+render(c)+" SubClassOf "+render(d));
@@ -983,7 +1080,7 @@ public class ProbabilisticGraphCalculator {
         return isValid;
     }
 
-    /**
+     /**
      * A subset of probabilistic edges may be entailed;
      * 
      * for example, an OMIM to DOID association may have a 0.75 probability of
@@ -1000,19 +1097,52 @@ public class ProbabilisticGraphCalculator {
      * @param reasoner
      * @return Any edges in the PrGraph for which the relationship between (s,t) can be entailed
      */
-    public Set<ProbabilisticEdge> findEntailedProbabilisticEdges(ProbabilisticGraph pg, OWLReasoner reasoner) {
-        Set<ProbabilisticEdge> rmEdges = new HashSet<>();
+    public EliminatedProbabilisticEdges findEntailedProbabilisticEdges(ProbabilisticGraph pg, OWLReasoner reasoner) {
+        EliminatedProbabilisticEdges elim = new EliminatedProbabilisticEdges();
+        for (OWLAxiom na : pg.getNegatedLogicalEdges()) {
+            //LOG.info("TESTING NEGAX: "+na);
+            if (na instanceof OWLEquivalentClassesAxiom) {
+                List<OWLClassExpression> args = ((OWLEquivalentClassesAxiom) na).getClassExpressionsAsList();
+                if (reasoner.getEquivalentClasses(args.get(0)).contains((OWLClass) args.get(1))) {
+                    elim.nInconsistencies++;
+                }  
+            }
+            else if (na instanceof OWLSubClassOfAxiom) {
+                if (reasoner.getSuperClasses(((OWLSubClassOfAxiom) na).getSubClass(), false).
+                        containsEntity((OWLClass) ((OWLSubClassOfAxiom) na).getSuperClass())) {
+                    elim.nInconsistencies++;
+                }
+
+            }
+        }
         for (ProbabilisticEdge e : pg.getProbabilisticEdges()) {
             OWLClass s = e.getSourceClass();
             OWLClass t = e.getTargetClass();
-            if (reasoner.getEquivalentClasses(s).contains(t) ||
-                    reasoner.getSuperClasses(s, false).containsEntity(t) ||
-                    reasoner.getSuperClasses(t, false).containsEntity(s)) {
-                rmEdges.add(e);
+            Map<EdgeType, Double> ptm = e.getProbabilityTable().getTypeProbabilityMap();
+            if (reasoner.getEquivalentClasses(s).contains(t)) {
+                elim.rmEdges.add(e);
+                if (ptm.get(EdgeType.EQUIVALENT_TO) == 0.0) {
+                    elim.nInconsistencies++;
+                }
+            }
+            else if (reasoner.getSuperClasses(s, false).containsEntity(t)) {
+                elim.rmEdges.add(e);
+                if (ptm.get(EdgeType.SUBCLASS_OF) == 0.0) {
+                    elim.nInconsistencies++;
+                }
+            }
+            else if (reasoner.getSuperClasses(t, false).containsEntity(s)) {
+                if (ptm.get(EdgeType.SUPERCLASS_OF) == 0.0) {
+                    elim.nInconsistencies++;
+                }
+                elim.rmEdges.add(e);
             }
         }
-        return rmEdges;
+        return elim;
     }
+    
+ 
+  
 
     /**
      * Computes the {@link ProbabilisticGraph.setProbabilityIndex()}
@@ -1280,15 +1410,16 @@ public class ProbabilisticGraphCalculator {
         if (bestAxiom != null) {
             sg.getLogicalEdges().add(bestAxiom); // translate the probabilistic edge to a logical edge
             sg.getProbabilisticEdgeReplacementMap().put(bestAxiom, e);
-            Set<ProbabilisticEdge> rmEdges = findEntailedProbabilisticEdges(sg, reasoner);
-            rmEdges.remove(e); // will already be removed
-            if (rmEdges.size() >0) {
-                LOG.info("  Eliminating entailed edges: "+rmEdges);
+            EliminatedProbabilisticEdges elim = findEntailedProbabilisticEdges(sg, reasoner);
+            if (elim.nInconsistencies > 0) {
+                LOG.error("INVALID. This should have been detected upstream: "+bestAxiom);
+            }
+            elim.rmEdges.remove(e); // will already be removed            
+            if (elim.rmEdges.size() >0) {
+                LOG.info("  Eliminating entailed edges: "+elim.rmEdges);
                 // TODO: get join probability of all axioms 
-                if (isExperimental) {
-                    LOG.error("TODO: calc probability");
-                    sg.getProbabilisticEdges().removeAll(rmEdges);
-                }
+                LOG.error("TODO: calc probability");
+                sg.getProbabilisticEdges().removeAll(elim.rmEdges);
             }
         }
         else {
