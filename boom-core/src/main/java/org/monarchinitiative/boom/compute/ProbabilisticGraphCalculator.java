@@ -340,17 +340,19 @@ public class ProbabilisticGraphCalculator {
             }
         }
 
-        LOG.info("Using weighted edges to find cliques...");
+        LOG.info("Using weighted edges to find cliques... pEdges="+probabilisticGraph.getProbabilisticEdges().size());
+        int nEquiv = 0;
         // assume every probabilistic edge is an equivalence axiom
         for (ProbabilisticEdge e : probabilisticGraph.getProbabilisticEdges()) {
             if (e.getProbabilityTable().getTypeProbabilityMap().get(EdgeType.NONE) < 1.0) {
                 OWLEquivalentClassesAxiom ax = translateEdgeToEquivalenceAxiom(e);
                 getOWLOntologyManager().addAxiom(dynamicOntology, ax);
+                nEquiv++;
             }
         }
         reasoner.flush();
 
-        LOG.info("Finding equivalence nodes...");
+        LOG.info("Finding equivalence nodes... eEdges = "+nEquiv);
         Set<Node<OWLClass>> cliques = new HashSet<>();
         int maxSize = 0;
         int i=0;
