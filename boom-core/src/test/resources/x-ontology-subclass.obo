@@ -1,0 +1,14 @@
+ontology: x
+
+[Term]
+id: Z:1
+name: z1
+
+[Term]
+id: X:1
+name: x1
+
+[Term]
+id: Y:1
+is_a: X:1
+name: "y1"

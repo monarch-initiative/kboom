@@ -1,0 +1,64 @@
+ontology: x
+remark: X:1 and X:2 are two disjoint branches
+ontology: disjoint_test
+
+[Term]
+id: X:root
+
+[Term]
+id: X:1
+name: x1
+is_a: X:root
+
+[Term]
+id: X:2
+is_a: X:root
+name: "x2"
+disjoint_from: X:1
+
+[Term]
+id: X:2b
+is_a: X:2
+
+[Term]
+id: X:2c
+is_a: X:2
+
+[Term]
+id: X:1b
+is_a: X:1
+
+[Term]
+id: X:1c
+is_a: X:1
+
+[Term]
+id: X:1cA
+is_a: X:1c
+
+[Term]
+id: Y:root
+
+[Term]
+id: Y:1
+is_a: Y:root
+
+[Term]
+id: Y:1b
+is_a: Y:1
+
+[Term]
+id: Y:1c
+is_a: Y:1
+
+[Term]
+id: Y:2b
+is_a: Y:2
+
+[Term]
+id: Y:2c
+is_a: Y:2
+
+[Term]
+id: Y:1cA
+is_a: Y:1c
