@@ -49,8 +49,11 @@ public class ProbabilisticGraphParser {
 		OWLDataFactory df = ontology.getOWLOntologyManager().getOWLDataFactory();
 		for (String line : lines) {
 			String[] vs = line.split("\\t");
-			IRI siri = IDTools.getIRIByIdentifier(vs[0]);
-			IRI tiri = IDTools.getIRIByIdentifier(vs[1]);
+
+			/* Remove the brackets from input string and make them as IRI objects*/
+			IRI siri = IDTools.getIRIByIdentifier(vs[0].replaceAll("[<|>]", ""));
+			IRI tiri = IDTools.getIRIByIdentifier(vs[1].replaceAll("[<|>]", ""));
+			
 			OWLClass s = df.getOWLClass(siri);
 			OWLClass t = df.getOWLClass(tiri);
 			
@@ -58,14 +61,15 @@ public class ProbabilisticGraphParser {
 				LOG.error("MISSING: "+line+" S="+s+" T="+t);
 				continue;
 			}
+			
 			ProbabilisticEdge e = new ProbabilisticEdge(s, t, 
 					Double.parseDouble(vs[2]),
 					Double.parseDouble(vs[3]),
 					Double.parseDouble(vs[4]),
 					Double.parseDouble(vs[5]));
 			pg.getProbabilisticEdges().add(e);
-					
 		}
+		
 		pg.collapseReciprocals();
 		return pg;
 	}
