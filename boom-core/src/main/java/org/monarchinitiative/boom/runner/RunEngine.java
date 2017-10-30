@@ -28,7 +28,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 public class RunEngine {
-
+	private static Logger LOG = Logger.getLogger(RunEngine.class);
+	
 	@Parameter(names = { "-v",  "--verbose" }, description = "Level of verbosity")
 	private Integer verbose = 1;
 
@@ -68,8 +69,6 @@ public class RunEngine {
 	@Parameter(description = "Files")
 	private List<String> files = new ArrayList<>();
 
-
-
 	public static void main(String ... args) throws OWLOntologyCreationException, IOException, OWLOntologyStorageException {
 		RunEngine main = new RunEngine();
 		JCommander jCommander = new JCommander(main, args);
@@ -103,7 +102,7 @@ public class RunEngine {
 			pgc.setCliqueSplitSize(cliqueSplitSize);
 		pgc.isExperimental = isExperimental;
 		if (isExperimental)
-			System.out.println("EXPERIMENTAL MODE");
+			LOG.info("Running as EXPERIMENTAL MODE...");
 
 		if (classIds != null && classIds.size() > 0) {
 			Set<OWLClass> filterOnClasses = 
@@ -121,6 +120,7 @@ public class RunEngine {
 		Set<CliqueSolution> rpts = pgc.solveAllCliques();
 
 		if (mdOutputFile != null) {
+			LOG.info("Generating a markdown report file with images: " + mdOutputFile);
 			FileUtils.writeStringToFile(new File(mdOutputFile), mdr.render(rpts));
 		}
 
@@ -144,12 +144,14 @@ public class RunEngine {
 
 		if (jsonOutPath == null)
 			System.out.println(s);
-		else
+		else {
+			LOG.info("Generating metadata on cliques: " + jsonOutPath);
 			FileUtils.writeStringToFile(new File(jsonOutPath), s);
-
+		}
+		
 		if (outpath == null)
 			outpath = "foo.owl";
-
+		LOG.info("Generating an ontology file: " +  outpath);
 		File file = new File(outpath);
 		sourceOntology.getOWLOntologyManager().saveOntology(outputOntology, IRI.create(file));
 	}

@@ -14,6 +14,8 @@ import org.monarchinitiative.boom.model.EdgeType;
 import org.monarchinitiative.boom.model.LabelUtil;
 import org.monarchinitiative.boom.model.ProbabilisticEdge;
 import org.monarchinitiative.boom.model.ProbabilisticGraph;
+import org.monarchinitiative.boom.util.CurieMapGenerator;
+import org.prefixcommons.CurieUtil;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -35,7 +37,7 @@ public class CliqueSolutionDotWriter {
 	private CliqueSolution cs;
 	private OWLOntology ontology;
 	private ProbabilisticGraph probabilisticGraph;
-
+	private CurieUtil curieUtil;
 
 	public CliqueSolutionDotWriter(CliqueSolution cs, OWLOntology ontology) {
 		super();
@@ -49,6 +51,9 @@ public class CliqueSolutionDotWriter {
 		this.cs = cs;
 		this.ontology = ontology;
 		this.probabilisticGraph = probabilisticGraph;
+		
+		CurieMapGenerator mapGenerator = CurieMapGenerator.getInstance();
+		curieUtil = new CurieUtil(mapGenerator.getCurieMap());
 	}
 
 	public String render() {
@@ -88,9 +93,7 @@ public class CliqueSolutionDotWriter {
 		return "subgraph cluster_"+getId(n.getRepresentativeElement()) +" {" + 
 				n.getEntities().stream().map( (OWLClass c) -> renderClass(c)).collect(Collectors.joining("\n")) +
 				"}\n";
-
 	}
-
 
 	private String renderClass(OWLClass c) {
 		return getId(c) + " [ label=\"" + getLabel(c) + "\" ];";
@@ -224,17 +227,17 @@ public class CliqueSolutionDotWriter {
 	}
 
 	private String getId(OWLClass c) {
-		return c.getIRI().getShortForm().replace(".", "_").replace("-", "_");
+		return curieUtil.getCurie(c.getIRI().toString()).get().replaceAll("[\\.|\\-|:|?]", "_");
 	}
 
 	private String getId(String c) {
-		return IRI.create(c).getShortForm();
+		return curieUtil.getCurie(c).get().replaceAll("[\\.|\\-|:|?]", "_");
 	}
 
 	private String getLabel(OWLClass c) {
 		String label = LabelUtil.getLabel(c, ontology);
 		label = label.replaceAll(" ", "\n");
 		label = label.replaceAll("\"", "'");
-		return c.getIRI().getShortForm() + " " + label;
+		return curieUtil.getCurie(c.getIRI().toString()).get() + " " + label;
 	}
 }
