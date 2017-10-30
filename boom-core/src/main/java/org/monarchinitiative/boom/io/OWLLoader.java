@@ -2,6 +2,7 @@ package org.monarchinitiative.boom.io;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.monarchinitiative.boom.compute.ProbabilisticGraphCalculator;

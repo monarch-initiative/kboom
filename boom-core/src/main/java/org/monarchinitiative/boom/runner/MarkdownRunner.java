@@ -38,11 +38,8 @@ public class MarkdownRunner {
 		LabelProvider provider = new LabelProvider(ontology);
 		renderer = new ManchesterOWLSyntaxOWLObjectRendererImpl();
 		renderer.setShortFormProvider(provider);
-
 	}
-
-
-
+	
 	public Set<CliqueSolution> runAll() throws OWLOntologyCreationException, IOException {
 		ProbabilisticGraphCalculator pgp = new ProbabilisticGraphCalculator(ontology);
 		return runAll(pgp);
@@ -61,8 +58,6 @@ public class MarkdownRunner {
 		return rpts;
 		
 	}
-	
-
 
 	public String render(Set<CliqueSolution> rpts) {
 		return rpts.stream().map( (cs) -> render(cs) ).collect(Collectors.joining());
@@ -91,7 +86,5 @@ public class MarkdownRunner {
 			e.printStackTrace();
 			return "";
 		}
-
 	}
-
 }

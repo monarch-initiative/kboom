@@ -28,130 +28,131 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 public class RunEngine {
+	private static Logger LOG = Logger.getLogger(RunEngine.class);
+	
+	@Parameter(names = { "-v",  "--verbose" }, description = "Level of verbosity")
+	private Integer verbose = 1;
 
-    @Parameter(names = { "-v",  "--verbose" }, description = "Level of verbosity")
-    private Integer verbose = 1;
+	@Parameter(names = { "-o", "--out"}, description = "output ontology file")
+	private String outpath;
 
-    @Parameter(names = { "-o", "--out"}, description = "output ontology file")
-    private String outpath;
+	@Parameter(names = { "-c", "--classes"}, description = "Run only on cliques containing these classes")
+	private List<String> classIds;
 
-    @Parameter(names = { "-c", "--classes"}, description = "Run only on cliques containing these classes")
-    private List<String> classIds;
+	@Parameter(names = { "-r", "--roots"}, description = "Run only on cliques traceable to these root superclasses")
+	private List<String> rootClassIds;
 
-    @Parameter(names = { "-r", "--roots"}, description = "Run only on cliques traceable to these root superclasses")
-    private List<String> rootClassIds;
+	@Parameter(names = { "-j", "--json"}, description = "output json report file")
+	private String jsonOutPath;
 
-    @Parameter(names = { "-j", "--json"}, description = "output json report file")
-    private String jsonOutPath;
+	@Parameter(names = { "-t", "--table"}, description = "Path to TSV of probability table")
+	private String ptableFile;
 
-    @Parameter(names = { "-t", "--table"}, description = "Path to TSV of probability table")
-    private String ptableFile;
+	@Parameter(names = { "-m", "--markdown"}, description = "Path to output markdown file")
+	private String mdOutputFile;
 
-    @Parameter(names = { "-m", "--markdown"}, description = "Path to output markdown file")
-    private String mdOutputFile;
+	@Parameter(names = { "-n", "--new"}, description = "Make new ontology")
+	private Boolean isMakeNewOntology = false;
 
-    @Parameter(names = { "-n", "--new"}, description = "Make new ontology")
-    private Boolean isMakeNewOntology = false;
+	@Parameter(names = { "--max" }, description = "Maximumum number of probabilistic edges in clique")
+	private Integer maxProbabilisticEdges = 9;
 
-    @Parameter(names = { "--max" }, description = "Maximumum number of probabilistic edges in clique")
-    private Integer maxProbabilisticEdges = 9;
+	@Parameter(names = { "--splitSize" }, description = "Threshold at which heuristic procedure is used to split clique")
+	private Integer cliqueSplitSize = 6;
 
-    @Parameter(names = { "--splitSize" }, description = "Threshold at which heuristic procedure is used to split clique")
-    private Integer cliqueSplitSize = 6;
+	@Parameter(names = { "--experimental" }, description = "Experimental")
+	private Boolean isExperimental = false;
 
-    @Parameter(names = { "--experimental" }, description = "Experimental")
-    private Boolean isExperimental = false;
+	@Parameter(names = {"-h", "--help"}, help = true)
+	private boolean help = false;
 
-    @Parameter(names = {"-h", "--help"}, help = true)
-    private boolean help = false;
+	@Parameter(description = "Files")
+	private List<String> files = new ArrayList<>();
 
-    @Parameter(description = "Files")
-    private List<String> files = new ArrayList<>();
+	public static void main(String ... args) throws OWLOntologyCreationException, IOException, OWLOntologyStorageException {
+		RunEngine main = new RunEngine();
+		JCommander jCommander = new JCommander(main, args);
+		if (main.help) {
+			jCommander.usage();
+			return;
+		}
+		main.run();
+	}
 
+	public void run() throws OWLOntologyCreationException, IOException, OWLOntologyStorageException {
+		Logger.getLogger("org.semanticweb.elk").setLevel(Level.OFF);
 
+		//System.out.printf("%s %d %s", groups, verbose, debug);
+		OWLLoader loader = new OWLLoader();
+		OWLOntology sourceOntology;
+		sourceOntology  = loader.load(files.get(0));
+		ProbabilisticGraphParser parser = 
+				new ProbabilisticGraphParser(sourceOntology);
 
-    public static void main(String ... args) throws OWLOntologyCreationException, IOException, OWLOntologyStorageException {
-        RunEngine main = new RunEngine();
-        JCommander jCommander = new JCommander(main, args);
-        if (main.help) {
-            jCommander.usage();
-            return;
-        }
-        main.run();
-    }
+		ProbabilisticGraph pg = 
+				parser.parse(ptableFile);
+		MarkdownRunner mdr = new MarkdownRunner(sourceOntology, pg);
 
-    public void run() throws OWLOntologyCreationException, IOException, OWLOntologyStorageException {
-        Logger.getLogger("org.semanticweb.elk").setLevel(Level.OFF);
+		ProbabilisticGraphCalculator pgc = new ProbabilisticGraphCalculator(sourceOntology);
 
-        //System.out.printf("%s %d %s", groups, verbose, debug);
-        OWLLoader loader = new OWLLoader();
-        OWLOntology sourceOntology;
-        sourceOntology  = loader.load(files.get(0));
-        ProbabilisticGraphParser parser = 
-                new ProbabilisticGraphParser(sourceOntology);
+		pgc.setProbabilisticGraph(pg);
+		if (maxProbabilisticEdges != null)
+			pgc.setMaxProbabilisticEdges(maxProbabilisticEdges);
+		if (cliqueSplitSize != null)
+			pgc.setCliqueSplitSize(cliqueSplitSize);
+		pgc.isExperimental = isExperimental;
+		if (isExperimental)
+			LOG.info("Running as EXPERIMENTAL MODE...");
 
-        ProbabilisticGraph pg = 
-                parser.parse(ptableFile);
-        MarkdownRunner mdr = new MarkdownRunner(sourceOntology, pg);
+		if (classIds != null && classIds.size() > 0) {
+			Set<OWLClass> filterOnClasses = 
+					classIds.stream().map( s -> 
+					pgc.getOWLDataFactory().getOWLClass(IDTools.getIRIByIdentifier(s))).collect(Collectors.toSet());
+			pgc.setFilterOnClasses(filterOnClasses);
+		}
+		if (rootClassIds != null && rootClassIds.size() > 0) {
+			Set<OWLClass> roots = 
+					rootClassIds.stream().map( s -> 
+					pgc.getOWLDataFactory().getOWLClass(IDTools.getIRIByIdentifier(s))).collect(Collectors.toSet());
+			pgc.setFilterOnRootClasses(roots);
+		}
 
-        ProbabilisticGraphCalculator pgc = new ProbabilisticGraphCalculator(sourceOntology);
+		Set<CliqueSolution> rpts = pgc.solveAllCliques();
 
-        pgc.setProbabilisticGraph(pg);
-        if (maxProbabilisticEdges != null)
-            pgc.setMaxProbabilisticEdges(maxProbabilisticEdges);
-        if (cliqueSplitSize != null)
-            pgc.setCliqueSplitSize(cliqueSplitSize);
-        pgc.isExperimental = isExperimental;
-        if (isExperimental)
-            System.out.println("EXPERIMENTAL MODE");
+		if (mdOutputFile != null) {
+			LOG.info("Generating a markdown report file with images: " + mdOutputFile);
+			FileUtils.writeStringToFile(new File(mdOutputFile), mdr.render(rpts));
+		}
 
-        if (classIds != null && classIds.size() > 0) {
-            Set<OWLClass> filterOnClasses = 
-                    classIds.stream().map( s -> 
-                    pgc.getOWLDataFactory().getOWLClass(IDTools.getIRIByIdentifier(s))).collect(Collectors.toSet());
-            pgc.setFilterOnClasses(filterOnClasses);
-        }
-        if (rootClassIds != null && rootClassIds.size() > 0) {
-            Set<OWLClass> roots = 
-                    rootClassIds.stream().map( s -> 
-                    pgc.getOWLDataFactory().getOWLClass(IDTools.getIRIByIdentifier(s))).collect(Collectors.toSet());
-            pgc.setFilterOnRootClasses(roots);
-        }
+		OWLOntology outputOntology;
+		if (isMakeNewOntology) {
+			outputOntology = sourceOntology.getOWLOntologyManager().createOntology();
+			for (CliqueSolution cs : rpts) {
+				sourceOntology.getOWLOntologyManager().addAxioms(outputOntology, cs.axioms);
+			}
+		}
+		else {
+			outputOntology = pgc.getSourceOntology();
+		}
 
-        Set<CliqueSolution> rpts = pgc.solveAllCliques();
+		Gson w = new GsonBuilder().
+				setPrettyPrinting().
+				serializeSpecialFloatingPointValues().
+				excludeFieldsWithoutExposeAnnotation().
+				create();
+		String s = w.toJson(rpts);
 
-        if (mdOutputFile != null) {
-            FileUtils.writeStringToFile(new File(mdOutputFile), mdr.render(rpts));
-        }
-
-        OWLOntology outputOntology;
-        if (isMakeNewOntology) {
-            outputOntology = sourceOntology.getOWLOntologyManager().createOntology();
-            for (CliqueSolution cs : rpts) {
-                sourceOntology.getOWLOntologyManager().addAxioms(outputOntology, cs.axioms);
-            }
-        }
-        else {
-            outputOntology = pgc.getSourceOntology();
-        }
-
-
-        Gson w = new GsonBuilder().
-                setPrettyPrinting().
-                serializeSpecialFloatingPointValues().
-                excludeFieldsWithoutExposeAnnotation().
-                create();
-        String s = w.toJson(rpts);
-        if (jsonOutPath == null)
-            System.out.println(s);
-        else
-            FileUtils.writeStringToFile(new File(jsonOutPath), s);
-
-        if (outpath == null)
-            outpath = "foo.owl";
-
-        File file = new File(outpath);
-        sourceOntology.getOWLOntologyManager().saveOntology(outputOntology, IRI.create(file));
-
-    }
+		if (jsonOutPath == null)
+			System.out.println(s);
+		else {
+			LOG.info("Generating metadata on cliques: " + jsonOutPath);
+			FileUtils.writeStringToFile(new File(jsonOutPath), s);
+		}
+		
+		if (outpath == null)
+			outpath = "foo.owl";
+		LOG.info("Generating an ontology file: " +  outpath);
+		File file = new File(outpath);
+		sourceOntology.getOWLOntologyManager().saveOntology(outputOntology, IRI.create(file));
+	}
 }
