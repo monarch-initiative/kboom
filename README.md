@@ -14,5 +14,3 @@ mvn install
 bin/kboom -t all-ptable.tsv all.owl -o merged.owl
 ```
 
-
-

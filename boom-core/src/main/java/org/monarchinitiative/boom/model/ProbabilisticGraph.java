@@ -33,6 +33,7 @@ public class ProbabilisticGraph {
 	
 	private static Logger LOG = Logger.getLogger(ProbabilisticGraph.class);
 
+	public static IRI DIFFERENT_FROM = IRI.create("http://example.org/differentFrom");
 
 	List<ProbabilisticEdge> probabilisticEdges = new ArrayList<ProbabilisticEdge>();
 	Set<OWLAxiom> logicalEdges =  new HashSet<OWLAxiom>();
@@ -213,8 +214,9 @@ public class ProbabilisticGraph {
 					pr = tpm.get(EdgeType.EQUIVALENT_TO);					
 				}
 				else {
-					ax = null;
-					pr = 1 - (tpm.get(EdgeType.EQUIVALENT_TO) + tpm.get(EdgeType.SUBCLASS_OF)	
+					OWLAnnotationProperty prop = df.getOWLAnnotationProperty(DIFFERENT_FROM);
+					ax = df.getOWLAnnotationAssertionAxiom(prop, sc.getIRI(), tc.getIRI());
+					pr = 1 - (tpm.get(EdgeType.EQUIVALENT_TO) + tpm.get(EdgeType.SUBCLASS_OF)
 							+ tpm.get(EdgeType.SUPERCLASS_OF));
 				}
 				//LOG.info("Pr["+ei+"]["+j+"]="+pr+" // "+ax);

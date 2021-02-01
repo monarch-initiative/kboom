@@ -1,0 +1,35 @@
+ontology: trivil
+remark: fake ontology
+
+[Term]
+id: A:1
+name: a1
+
+[Term]
+id: B:1
+name: b1
+
+[Term]
+id: A:2
+name: a2
+
+[Term]
+id: B:2
+name: b2
+
+[Term]
+id: A:3
+name: a3
+
+[Term]
+id: B:3
+name: b3
+
+[Term]
+id: A:4
+name: a4
+
+[Term]
+id: B:4
+name: b4
+
