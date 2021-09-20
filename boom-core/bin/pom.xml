@@ -11,7 +11,7 @@
 	<name>owlsim-core</name>
 
 	<properties>
-		<jena.version>2.11.2</jena.version>
+		<jena.version>4.2.0</jena.version>
 	</properties>
 
 	<dependencies>
