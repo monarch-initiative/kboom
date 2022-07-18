@@ -20,6 +20,7 @@ import org.monarchinitiative.boom.runner.MarkdownRunner;
 import org.obolibrary.oboformat.parser.OBOFormatParserException;
 import org.semanticweb.owlapi.formats.RDFXMLDocumentFormat;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -184,6 +185,20 @@ public class ProbabilisticGraphCalculatorTest {
     }
 
     @Test
+    public void testTrivialCombos() throws OWLOntologyCreationException, OBOFormatParserException, IOException, OWLOntologyStorageException {
+
+        Set<CliqueSolution> solns =
+                runUsingResources("trivial-4-combos.obo", "ptable-trivial-4-combos.tsv", "trivial-4-combos-resolved.owl",
+                        subclass("A_1", "B_1"),
+                        subclass("B_2", "A_2"),
+                        equiv("A_3", "B_3")
+                );
+        assertEquals(4, solns.size());
+        CliqueSolution s = solns.iterator().next();
+        //assertTrue("low confidence expected", s.confidence < 0.1);
+    }
+
+    @Test
     public void testReciprocalConflict() throws OWLOntologyCreationException, OBOFormatParserException, IOException, OWLOntologyStorageException {
         // Pr(X1<Y1) = 0.9 [row 1]
         // Pr(X1<Y1) = 0.05 [row 2]
@@ -236,7 +251,7 @@ public class ProbabilisticGraphCalculatorTest {
         assertEquals(1, solns.size());
         CliqueSolution s = solns.iterator().next();
         assertEquals("this clique has a single solution, which is to reject the proposed axiom",
-                0, s.axioms.size());
+                1, s.axioms.size());
     }
 
 
@@ -264,7 +279,7 @@ public class ProbabilisticGraphCalculatorTest {
         assertEquals(1, solns.size());
         CliqueSolution s = solns.iterator().next();
         assertEquals("this clique has a single solution, which is to accept the proposed axiom",
-                0, s.axioms.size());
+                1, s.axioms.size());
     }
 
     @Test
@@ -342,6 +357,12 @@ public class ProbabilisticGraphCalculatorTest {
     }
 
 
+
+
+    public ExpectedAxiom different(String c1, String c2) {
+        OWLAnnotationProperty prop = df().getOWLAnnotationProperty(ProbabilisticGraph.DIFFERENT_FROM);
+        return new ExpectedAxiom(df().getOWLAnnotationAssertionAxiom(prop, getIRI(c1), getIRI(c2)));
+    }
 
     public ExpectedAxiom equiv(String c1, String c2) {
         return new ExpectedAxiom(df().getOWLEquivalentClassesAxiom(

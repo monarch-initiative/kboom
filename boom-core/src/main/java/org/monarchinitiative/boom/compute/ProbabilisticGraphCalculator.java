@@ -18,22 +18,7 @@ import org.monarchinitiative.boom.model.ProbabilisticGraph;
 import org.semanticweb.elk.owlapi.ElkReasonerFactory;
 import org.semanticweb.owlapi.io.OWLObjectRenderer;
 import org.semanticweb.owlapi.manchestersyntax.renderer.ManchesterOWLSyntaxOWLObjectRendererImpl;
-import org.semanticweb.owlapi.model.AddImport;
-import org.semanticweb.owlapi.model.AxiomType;
-import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLClassExpression;
-import org.semanticweb.owlapi.model.OWLDataFactory;
-import org.semanticweb.owlapi.model.OWLDisjointClassesAxiom;
-import org.semanticweb.owlapi.model.OWLEntity;
-import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
-import org.semanticweb.owlapi.model.OWLImportsDeclaration;
-import org.semanticweb.owlapi.model.OWLObject;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
+import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.model.parameters.Imports;
 import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
@@ -557,6 +542,8 @@ public class ProbabilisticGraphCalculator {
 
         Double initialProbability = 1.0;
 
+        Double minProbability = 1.0;
+
         // ---
         // reduce combinatorial possibilities using greedy algorithm to turn
         // pr edges into logical edges
@@ -635,8 +622,6 @@ public class ProbabilisticGraphCalculator {
             LOG.info("  CLIQUE MEMBER:"+render(c));
         }
 
-
-
         OWLAxiom[][] axiomIndex = subPrGraph.getAxiomIndex();
         double[][] probabilityIndex = subPrGraph.getProbabilityIndex();
 
@@ -679,23 +664,25 @@ public class ProbabilisticGraphCalculator {
             Set<OWLAxiom> axiomCombo = new HashSet<OWLAxiom>();
             boolean isZeroProbability = false;
             double jointProbability = 1;
+
+            // iterate through each prEdge, and assign it one of 4 possible states
             for (int ei = 0; ei < N; ei++) {
                 char sc = states[ei];
                 int j = Character.getNumericValue(sc);
                 double pr = probabilityIndex[ei][j];
-
+                //LOG.info("xxxx ei="+ei+"/"+N+" jp="+jointProbability+" pr="+pr+" state="+new String(states)+" mjp="+maxJointProbability);
                 // TODO: refactor to use logs;
                 // not urgent as we don't expect underflows
                 jointProbability *= pr;
 
                 // TODO: change threshold
                 if (pr < 0.001 || jointProbability < maxJointProbability) {
+                    //LOG.info("xxxx Skipping Pr="+pr+" because jointProb "+jointProbability+" < "+maxJointProbability+" // pr="+pr);
                     // we do not progress any further if it is impossible to beat the
                     // current best, or if the end result will be below a threshold
                     isZeroProbability = true;
-                    jointProbability = 0;
+                    //jointProbability = 0;
                     numFilteredByProb++;
-                    //LOG.info("Skipping Pr="+pr);
                     break;
                 }
                 if (jointProbability < Math.pow(0.01, N)) {
@@ -710,6 +697,10 @@ public class ProbabilisticGraphCalculator {
                     axiomCombo.add(ax);
             }
             if (jointProbability == 0 || jointProbability < maxJointProbability) {
+                //LOG.info("xxxx moving into next state, as jointProb too low: "+jointProbability);
+                if (jointProbability > 0.0) {
+                    stateScoreMap.put(s, jointProbability);
+                }
                 continue;
             }
             // TEST CONSISTENCY: 
@@ -736,7 +727,7 @@ public class ProbabilisticGraphCalculator {
                     if (isInSameOntology(c, d)) {
                         // LOG.info("Same ontology: "+c+" "+d);
                         if (reasoner.getEquivalentClasses(c).contains(d)) {
-                            //LOG.info("   XX INVALID: "+c+"=="+d);
+                            //LOG.info("   xxxx INVALID: "+c+"=="+d);
                             isZeroProbability = true;
                             jointProbability = 0;
                             numEquivInSameOnt++;
@@ -756,7 +747,7 @@ public class ProbabilisticGraphCalculator {
                     }
                     if (assertedSuperClassesMap.get(c).contains(d)) {
                         if (reasoner.getEquivalentClasses(c).contains(d)) {
-                            //LOG.info("   Cannot overide: "+c+" SubClassOf "+d);
+                            //LOG.info("  xxxx Cannot overide: "+c+" SubClassOf "+d);
                             isZeroProbability = true;
                             jointProbability = 0;
                             numWithInvalidEquivClass++;
@@ -765,7 +756,7 @@ public class ProbabilisticGraphCalculator {
 
                     }
                     if (!reasoner.isSatisfiable(c)) {
-                        //LOG.info("UNSAT:"+c+" in state: "+s);
+                        //LOG.info("xxxxUNSAT:"+c+" in state: "+s);
                         isZeroProbability = true;
                         jointProbability = 0;
                         numUnsats++;
@@ -790,7 +781,7 @@ public class ProbabilisticGraphCalculator {
             candidateCombinationOfNewAxioms.addAll(additionalLogicalAxioms);
 
             for (OWLAxiom candidateAxiom : candidateCombinationOfNewAxioms) {
-                //LOG.debug("CANDIDATE: "+candidateAxiom);
+                //LOG.info("xxxxCANDIDATE: "+candidateAxiom + " / "+candidateCombinationOfNewAxioms.size());
                 if (candidateAxiom instanceof OWLSubClassOfAxiom) {
                     OWLClass c = (OWLClass) ((OWLSubClassOfAxiom) candidateAxiom).getSubClass();
                     OWLClass t = (OWLClass) ((OWLSubClassOfAxiom) candidateAxiom).getSuperClass();
@@ -814,7 +805,7 @@ public class ProbabilisticGraphCalculator {
                         }
                     }
                 }
-                else {
+                else if (candidateAxiom instanceof OWLEquivalentClassesAxiom) {
                     OWLEquivalentClassesAxiom eax = (OWLEquivalentClassesAxiom)candidateAxiom;
                     List<OWLClassExpression> xs = eax.getClassExpressionsAsList();
                     // guaranteed to have 2
@@ -827,6 +818,9 @@ public class ProbabilisticGraphCalculator {
                         numMissingEquivClass++;
                         break;
                     }
+                }
+                else {
+                    // annotation axiom
                 }
             }
             if (isZeroProbability) {
@@ -842,8 +836,9 @@ public class ProbabilisticGraphCalculator {
             if (maxParents > 1) {
                 pMaxParents = 0.4 * (1.0 / Math.pow(2, maxParents-1));
             }
-            LOG.debug("MAX_PARENTS:"+maxParents+" p="+pMaxParents);
-            jointProbability *= pMaxParents;
+            //LOG.info("xxxx MAX_PARENTS:"+maxParents+" p="+pMaxParents+ " jp="+jointProbability+" init="+initialProbability);
+            //disable
+            //jointProbability *= pMaxParents;
 
             jointProbability *= initialProbability;
 
@@ -855,7 +850,7 @@ public class ProbabilisticGraphCalculator {
                 currentBestCombinationOfAxioms = new HashSet<OWLAxiom>(axiomCombo);
             }
             numValidCombos++;
-        }
+        } // end of iterating through all combos
 
         LOG.info("NUM VALID COMBOS:"+numValidCombos+" / "+NUM_STATES);
         if (numValidCombos == 0) {
@@ -971,7 +966,7 @@ public class ProbabilisticGraphCalculator {
                     isValid = false;
                 }
             }
-            else {
+            else if (candidateAxiom instanceof OWLEquivalentClassesAxiom) {
                 OWLEquivalentClassesAxiom eax = (OWLEquivalentClassesAxiom)candidateAxiom;
                 List<OWLClassExpression> xs = eax.getClassExpressionsAsList();
                 // guaranteed to have 2
@@ -1018,9 +1013,9 @@ public class ProbabilisticGraphCalculator {
 
     /**
      * Computes the {@link ProbabilisticGraph.setProbabilityIndex()}
-     * 
+     *
      * NOTE: if the probabilistic edge list changes, this must be recalculated
-     * 
+     *
      * @param probabilisticGraph
      */
     public void OLDcalculateEdgeProbabilityMatrix(ProbabilisticGraph probabilisticGraph) {
@@ -1052,16 +1047,19 @@ public class ProbabilisticGraphCalculator {
                 }
                 else if (j==2) {
                     ax = df.getOWLSubClassOfAxiom(tc, sc);
-                    pr = tpm.get(EdgeType.SUPERCLASS_OF);					
+                    pr = tpm.get(EdgeType.SUPERCLASS_OF);
                 }
                 else if (j == 3) {
                     ax = df.getOWLEquivalentClassesAxiom(sc, tc);
-                    pr = tpm.get(EdgeType.EQUIVALENT_TO);					
+                    pr = tpm.get(EdgeType.EQUIVALENT_TO);
                 }
                 else {
-                    ax = null;
-                    pr = 1 - (tpm.get(EdgeType.EQUIVALENT_TO) + tpm.get(EdgeType.SUBCLASS_OF)	
+                    OWLAnnotationProperty prop = df.getOWLAnnotationProperty(IRI.create("http://example.org/differentFrom"));
+                    ax = df.getOWLAnnotationAssertionAxiom(prop, sc.getIRI(), tc.getIRI());
+                    //ax = null;
+                    pr = 1 - (tpm.get(EdgeType.EQUIVALENT_TO) + tpm.get(EdgeType.SUBCLASS_OF)
                     + tpm.get(EdgeType.SUPERCLASS_OF));
+                    //LOG.info("Ax: "+ax+" Pr="+pr);
                 }
                 //LOG.info("Pr["+ei+"]["+j+"]="+pr+" // "+ax);
                 probabilityIndex[ei][j] = pr;
@@ -1071,6 +1069,7 @@ public class ProbabilisticGraphCalculator {
                     LOG.error("ERROR: "+ax+" ***** "+pr);
                 }
             }
+            //LOG.info("xxx AxiomIndex: " + axiomIndex);
         }
         probabilisticGraph.setAxiomIndex(axiomIndex);
         probabilisticGraph.setProbabilityIndex(probabilityIndex);

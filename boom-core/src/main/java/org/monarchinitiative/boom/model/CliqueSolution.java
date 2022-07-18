@@ -25,9 +25,11 @@ public class CliqueSolution {
 	@Expose public int size;
 	@Expose public int initialNumberOfProbabilisticEdges;
 	@Expose public Double probability;
+	@Expose public Double minProbability;
 	@Expose public Double confidence;
 	@Expose public Boolean solved;
 	@Expose public List<String> messages = new ArrayList<String>();
+	@Expose public List<String> selections = new ArrayList<String>();
 	@Expose public long timeToSolve;
 	
 	public Set<OWLClass> classes = new HashSet<>();

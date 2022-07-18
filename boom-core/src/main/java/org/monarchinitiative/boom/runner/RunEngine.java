@@ -50,6 +50,9 @@ public class RunEngine {
     @Parameter(names = { "-m", "--markdown"}, description = "Path to output markdown file")
     private String mdOutputFile;
 
+    @Parameter(names = { "-d", "--dir"}, description = "directory")
+    private String dir = ".";
+
     @Parameter(names = { "-n", "--new"}, description = "Make new ontology")
     private Boolean isMakeNewOntology = false;
 
@@ -116,6 +119,16 @@ public class RunEngine {
                     rootClassIds.stream().map( s -> 
                     pgc.getOWLDataFactory().getOWLClass(IDTools.getIRIByIdentifier(s))).collect(Collectors.toSet());
             pgc.setFilterOnRootClasses(roots);
+        }
+
+        if (dir != null) {
+            if (mdOutputFile == null) {
+                mdOutputFile = dir + "/kboom-report.md";
+            }
+            if (jsonOutPath == null) {
+                jsonOutPath = dir + "/kboom-report.json";
+            }
+            mdr.imageFilesPath = dir + "/images/";
         }
 
         Set<CliqueSolution> rpts = pgc.solveAllCliques();
